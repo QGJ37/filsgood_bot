@@ -25,11 +25,17 @@ RUN apt-get update && apt-get install -y \
     cron \
     && rm -rf /var/lib/apt/lists/*
 
+# Debug étape : Vérification des versions des packages installés
+RUN echo "Vérification des versions des packages installés" && \
+    google-chrome-stable --version
+
 # Installer Google Chrome stable
-RUN curl -sSL https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -o google-chrome-stable_current_amd64.deb \
-    && dpkg -i google-chrome-stable_current_amd64.deb \
-    && apt-get install -y -f \
-    && rm google-chrome-stable_current_amd64.deb
+RUN curl -sSL https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -o google-chrome-stable_current_amd64.deb && \
+    dpkg -i google-chrome-stable_current_amd64.deb || apt-get install -y -f && \
+    rm google-chrome-stable_current_amd64.deb
+
+# Vérification de l'installation de Chrome
+RUN google-chrome-stable --version
 
 # Télécharger et installer ChromeDriver correspondant à la version de Chrome
 RUN CHROME_VERSION=$(google-chrome-stable --version | sed 's/Google Chrome //') \
