@@ -6,7 +6,7 @@ def run_bot():
     # options.add_argument("--start-maximized")  # À supprimer pour headless
 
     driver = webdriver.Remote(
-        command_executor="http://filsgood_bot-selenium:4444/wd/hub",  # Connexion à Selenium Grid via le nom d'hôte du conteneur
+        command_executor="http://172.16.10.2:4444/wd/hub",  # Connexion à Selenium Grid via le nom d'hôte du conteneur
         desired_capabilities={'browserName': 'chrome'}
     )
 
