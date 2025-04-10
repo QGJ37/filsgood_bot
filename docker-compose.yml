@@ -2,11 +2,18 @@ version: '3'
 
 services:
   bot:
-    build: .
+    build:
+      context: .  # Chemin vers ton répertoire local
+    depends_on:
+      - selenium
+    environment:
+      - SELENIUM_HOST=selenium
+      
     volumes:
-      - .:/mnt/nvme-data/AppData/filsgood_bot  # Monte le répertoire local dans le conteneur
+      - /mnt/nvme-data/AppData/filsgood_bot:/app  # Assure-toi de faire le lien entre ton dossier local et le conteneur
+    command: ["cron", "-f"]
     restart: unless-stopped
-
+ 
   selenium:
     image: selenium/standalone-chrome:latest
     ports:
