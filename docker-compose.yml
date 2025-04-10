@@ -1,9 +1,7 @@
-version: '3'
-
 services:
   bot:
     build:
-      context: .  # Assure-toi que le Dockerfile et tous les fichiers nécessaires sont dans le répertoire
+      context: . # Assure-toi que le Dockerfile et tous les fichiers nécessaires sont dans le répertoire
     depends_on:
       - selenium
     environment:
