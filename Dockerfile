@@ -1,58 +1,49 @@
-# Étape 1 : Utiliser une image officielle de Python comme base
+# Utilisation d'une image officielle Python comme base
 FROM python:3.9-slim
 
-# Étape 2 : Installer les dépendances système nécessaires
+# Installation des dépendances nécessaires pour Selenium et Chrome
 RUN apt-get update && apt-get install -y \
     wget \
     curl \
     unzip \
-    libnss3 \
+    libx11-dev \
+    libxkbfile-dev \
     libgdk-pixbuf2.0-0 \
-    libx11-xcb1 \
     libxcomposite1 \
     libxrandr2 \
     libgdk-pixbuf2.0-0 \
-    libatk-bridge2.0-0 \
-    libatk1.0-0 \
-    ca-certificates \
-    fonts-liberation \
-    libappindicator3-1 \
-    libasound2 \
-    libnspr4 \
-    libxtst6 \
+    libnss3 \
+    libgconf-2-4 \
+    libfontconfig1 \
     libxss1 \
-    libxtst6 \
-    libdbus-glib-1-2 \
-    libglib2.0-0 \
-    libfreetype6 \
+    libappindicator1 \
+    libindicator7 \
+    git \
     cron \
-    && apt-get clean
+    --no-install-recommends
 
-# Étape 3 : Télécharger et installer Chrome
-RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-RUN dpkg -i google-chrome-stable_current_amd64.deb || apt-get -f install -y
+# Cloner le dépôt GitHub
+RUN git clone https://github.com/QGJ37/filsgood_bot.git /app
 
-# Étape 4 : Installer ChromeDriver
-RUN CHROME_DRIVER_VERSION=`curl -sS https://chromedriver.storage.googleapis.com/LATEST_RELEASE` && \
-    wget -N https://chromedriver.storage.googleapis.com/$CHROME_DRIVER_VERSION/chromedriver_linux64.zip && \
-    unzip chromedriver_linux64.zip -d /usr/local/bin/ && \
-    rm chromedriver_linux64.zip
-
-# Étape 5 : Définir le répertoire de travail
+# Se positionner dans le répertoire du projet
 WORKDIR /app
 
-# Étape 6 : Copier le fichier requirements.txt et installer les dépendances Python
-COPY requirements.txt /app/requirements.txt
+# Installer les dépendances Python
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Étape 7 : Copier le script du bot dans le conteneur
-COPY bot.py /app/bot.py
+# Installer le ChromeDriver
+RUN wget https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip
+RUN unzip chromedriver_linux64.zip -d /usr/local/bin
+RUN rm chromedriver_linux64.zip
 
-# Étape 8 : Copier le fichier cron pour la planification
-COPY cronfile /etc/cron.d/bot-cron
+# Copier le fichier cronfile dans le conteneur
+COPY cronfile /etc/cron.d/filsgood-cron
+RUN chmod 0644 /etc/cron.d/filsgood-cron
+RUN crontab /etc/cron.d/filsgood-cron
 
-# Étape 9 : Appliquer les permissions nécessaires
-RUN chmod 0644 /etc/cron.d/bot-cron
+# Copier ton script bot.py dans le conteneur
+COPY bot.py .
 
-# Étape 10 : Démarrer cron en arrière-plan
-CMD cron && tail -f /var/log/cron.log
+# Démarrer le cron à l'exécution du conteneur
+CMD ["cron", "-f"]

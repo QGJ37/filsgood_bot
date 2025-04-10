@@ -17,3 +17,6 @@ services:
     volumes:
       - .:/app
     command: ["cron", "-f"]
+    environment:
+      - GIT_REPO_URL=https://github.com/QGJ37/filsgood_bot.git
+      - GIT_BRANCH=main
