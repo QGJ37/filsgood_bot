@@ -30,17 +30,20 @@ RUN curl -sSL https://dl.google.com/linux/direct/google-chrome-stable_current_am
 RUN dpkg -i google-chrome-stable_current_amd64.deb || apt-get install -y -f
 RUN rm google-chrome-stable_current_amd64.deb
 
-# Vérifier la version de Google Chrome
+# Vérification de la version de Google Chrome
 RUN google-chrome-stable --version || echo "Erreur : Google Chrome n'a pas pu être installé"
 
-# Télécharger la version de Chrome et ChromeDriver
-RUN CHROME_VERSION=$(google-chrome-stable --version | sed 's/Google Chrome //') && \
-    echo "Version de Google Chrome: $CHROME_VERSION" && \
+# Vérification de la version de Chrome et récupération de ChromeDriver étape par étape
+RUN echo "Vérification de la version de Google Chrome" && \
+    CHROME_VERSION=$(google-chrome-stable --version | sed 's/Google Chrome //') && \
+    echo "Version de Google Chrome : $CHROME_VERSION" && \
     CHROME_DRIVER_VERSION=$(curl -sSL https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_VERSION%.*}) && \
-    echo "Version de ChromeDriver: $CHROME_DRIVER_VERSION" && \
+    echo "Version de ChromeDriver : $CHROME_DRIVER_VERSION" && \
     wget https://chromedriver.storage.googleapis.com/${CHROME_DRIVER_VERSION}/chromedriver_linux64.zip -O chromedriver_linux64.zip && \
+    echo "Téléchargement de ChromeDriver réussi" && \
     unzip chromedriver_linux64.zip -d /usr/local/bin/ && \
-    rm chromedriver_linux64.zip
+    rm chromedriver_linux64.zip && \
+    echo "ChromeDriver installé avec succès"
 
 # Définir le répertoire de travail dans le conteneur
 WORKDIR /app
