@@ -1,13 +1,12 @@
 services:
   bot:
     build:
-      context: . # Assure-toi que le Dockerfile et tous les fichiers nécessaires sont dans le répertoire
+      context: .  # Le contexte local au dépôt Git
     depends_on:
       - selenium
     environment:
       - SELENIUM_HOST=selenium
-    volumes:
-      - /mnt/nvme-data/AppData/filsgood_bot:/app  # Assure-toi que le dossier est bien monté
+    # Volume supprimé pour éviter les conflits avec Portainer
     command: ["sh", "-c", "until curl -s selenium:4444/wd/hub/status | grep -q '200'; do echo 'En attente de Selenium...'; sleep 3; done; echo 'Selenium prêt, lancement du bot'; cron -f"]
     restart: unless-stopped
 
