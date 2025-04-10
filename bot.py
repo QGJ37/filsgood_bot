@@ -1,22 +1,3 @@
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.support.ui import Select
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-import time
-
-def wait_for_element(driver, by, value, timeout=10):
-    return WebDriverWait(driver, timeout).until(EC.presence_of_element_located((by, value)))
-
-def click_next(driver, button_text):
-    try:
-        btn = wait_for_element(driver, By.XPATH, f"//button[contains(text(), '{button_text}')]")
-        btn.click()
-        time.sleep(1)
-    except Exception as e:
-        print(f"Erreur lors du clic sur '{button_text}':", e)
-
 def run_bot():
     options = Options()
     options.add_argument("--headless")  # Mode headless pour éviter l'interface graphique
@@ -25,7 +6,7 @@ def run_bot():
     # options.add_argument("--start-maximized")  # À supprimer pour headless
 
     driver = webdriver.Remote(
-        command_executor="http://172.16.10.2/wd/hub",  # Connexion à Selenium Grid
+        command_executor="http://filsgood_bot-selenium:4444/wd/hub",  # Connexion à Selenium Grid via le nom d'hôte du conteneur
         desired_capabilities={'browserName': 'chrome'}
     )
 
