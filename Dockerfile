@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y \
     curl \
     gnupg2 \
     ca-certificates \
+    unzip \
     libx11-dev \
     libxext6 \
     libxi6 \
@@ -26,25 +27,19 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Télécharger et installer Google Chrome
-RUN curl -sSL https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -o google-chrome-stable_current_amd64.deb
-RUN dpkg -i google-chrome-stable_current_amd64.deb || apt-get install -y -f
-RUN rm google-chrome-stable_current_amd64.deb
+RUN curl -sSL https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -o google-chrome-stable_current_amd64.deb && \
+    dpkg -i google-chrome-stable_current_amd64.deb || apt-get install -y -f && \
+    rm google-chrome-stable_current_amd64.deb
 
 # Vérification de la version de Google Chrome
 RUN google-chrome-stable --version || echo "Erreur : Google Chrome n'a pas pu être installé"
 
-# Vérification de la version de Chrome et récupération de ChromeDriver étape par étape
-RUN echo "Vérification de la version de Google Chrome" && \
-    CHROME_VERSION=$(google-chrome-stable --version | sed 's/Google Chrome //') && \
-    echo "Version de Google Chrome : $CHROME_VERSION" && \
+# Télécharger et installer ChromeDriver correspondant à la version de Google Chrome
+RUN CHROME_VERSION=$(google-chrome-stable --version | sed 's/Google Chrome //') && \
     CHROME_DRIVER_VERSION=$(curl -sSL https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_VERSION%.*}) && \
-    echo "Version de ChromeDriver : $CHROME_DRIVER_VERSION" && \
-    curl -O https://chromedriver.storage.googleapis.com/${CHROME_DRIVER_VERSION}/chromedriver_linux64.zip || echo "Erreur de téléchargement de ChromeDriver" && \
-    ls -l chromedriver_linux64.zip && \
+    curl -sSL https://chromedriver.storage.googleapis.com/${CHROME_DRIVER_VERSION}/chromedriver_linux64.zip -o chromedriver_linux64.zip && \
     unzip chromedriver_linux64.zip -d /usr/local/bin/ && \
-    echo "Extraction de ChromeDriver réussie" && \
-    rm chromedriver_linux64.zip && \
-    echo "ChromeDriver installé avec succès"
+    rm chromedriver_linux64.zip
 
 # Définir le répertoire de travail dans le conteneur
 WORKDIR /app
@@ -60,8 +55,7 @@ COPY . /app/
 COPY cronfile /etc/cron.d/filsgood-cron
 
 # Donner les bonnes permissions au fichier cron et appliquer les tâches cron
-RUN chmod 0644 /etc/cron.d/filsgood-cron \
-    && crontab /etc/cron.d/filsgood-cron
+RUN chmod 0644 /etc/cron.d/filsgood-cron && crontab /etc/cron.d/filsgood-cron
 
 # Exécuter cron en mode foreground
 CMD ["cron", "-f"]
