@@ -25,7 +25,7 @@ def run_bot():
     # options.add_argument("--start-maximized")  # À supprimer pour headless
 
     driver = webdriver.Remote(
-        command_executor="http://selenium/wd/hub",  # Connexion à Selenium Grid
+        command_executor="http://nas/wd/hub",  # Connexion à Selenium Grid
         desired_capabilities={'browserName': 'chrome'}
     )
 

@@ -9,7 +9,7 @@ services:
       - SELENIUM_HOST=selenium
     volumes:
       - /mnt/nvme-data/AppData/filsgood_bot:/app  # Assure-toi que le dossier est bien monté
-    command: ["sh", "-c", "apt-get update && apt-get install -y curl && until curl -s selenium:4444/wd/hub/status | grep -q '200'; do echo 'En attente de Selenium...'; sleep 3; done; echo 'Selenium prêt, lancement du bot'; cron -f"]
+    command: ["sh", "-c", "apt-get update && apt-get install -y curl && until curl -s nas:4444/wd/hub/status | grep -q '200'; do echo 'En attente de Selenium...'; sleep 3; done; echo 'Selenium prêt, lancement du bot'; cron -f"]
     restart: unless-stopped
 
   selenium:
