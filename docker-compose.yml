@@ -20,7 +20,7 @@ services:
       - SELENIUM_HOST=filsgood_bot-selenium  # Change l'hôte pour le nom du conteneur Selenium
     volumes:
       - /mnt/nvme-data/AppData/filsgood_bot:/app  # Assure-toi que le dossier est bien monté
-    command: ["sh", "-c", "apt-get update && apt-get install -y curl cron && until curl -s http://filsgood_bot-selenium:4444/wd/hub/status | grep -q '\"ready\": true'; do echo 'En attente de Selenium...'; sleep 5; done; echo 'Selenium prêt, lancement du bot'; cron -f"]
+    command: ["sh", "-c", "apt-get update && apt-get install -y curl cron && cp /app/cronfile /etc/cron.d/filsgood_bot && chmod 0644 /etc/cron.d/filsgood_bot && cron && tail -f /var/log/cron.log"]
     restart: unless-stopped
     networks:
       - filsgood_bot_network  # Réseau commun avec Selenium
