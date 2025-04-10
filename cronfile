@@ -1,0 +1,5 @@
+# Exécution aléatoire entre 9h et 10h, 4 fois par jour, du lundi au vendredi
+*/15 9-10 * * 1-5 root cd /app && python bot.py >> /var/log/cron.log 2>&1
+*/15 9-10 * * 1-5 root cd /app && python bot.py >> /var/log/cron.log 2>&1
+*/15 9-10 * * 1-5 root cd /app && python bot.py >> /var/log/cron.log 2>&1
+*/15 9-10 * * 1-5 root cd /app && python bot.py >> /var/log/cron.log 2>&1
