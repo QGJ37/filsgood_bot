@@ -1,5 +1,5 @@
-# Utiliser une image de base Python légère
-FROM python:3.9-slim
+# Utiliser une image de base plus complète avec des outils nécessaires
+FROM python:3.9-buster
 
 # Mettre à jour le package manager et installer les dépendances nécessaires
 RUN apt-get update && apt-get install -y \
@@ -25,9 +25,11 @@ RUN apt-get update && apt-get install -y \
     fonts-liberation \
     cron \
     lsb-release \
+    libappindicator3-1 \
+    libindicator7 \
     && rm -rf /var/lib/apt/lists/*
 
-# Installer Google Chrome stable avec un autre moyen (par téléchargement direct du package .deb)
+# Télécharger et installer Google Chrome stable
 RUN curl -sSL https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -o google-chrome-stable_current_amd64.deb && \
     apt-get install -y ./google-chrome-stable_current_amd64.deb && \
     rm google-chrome-stable_current_amd64.deb
