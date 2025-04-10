@@ -1,22 +1,16 @@
 version: '3'
 
 services:
+  bot:
+    build: .
+    volumes:
+      - .:/mnt/nvme-data/AppData/filsgood_bot  # Monte le répertoire local dans le conteneur
+    restart: unless-stopped
+
   selenium:
     image: selenium/standalone-chrome:latest
     ports:
       - "4444:4444"
     volumes:
       - /dev/shm:/dev/shm
-
-  bot:
-    build: .
-    depends_on:
-      - selenium
-    environment:
-      - SELENIUM_HOST=selenium
-    volumes:
-      - .:/app
-    command: ["cron", "-f"]
-    environment:
-      - GIT_REPO_URL=https://github.com/QGJ37/filsgood_bot.git
-      - GIT_BRANCH=main
+    restart: unless-stopped
