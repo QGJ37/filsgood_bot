@@ -1,5 +1,17 @@
 version: "3.8"
 services:
+  selenium:
+    container_name: filsgood_bot-selenium
+    image: selenium/standalone-chrome:latest
+    ports:
+      - "4444:4444"
+    volumes:
+      - /dev/shm:/dev/shm
+    restart: unless-stopped
+    networks:
+      - filsgood_bot_network  # Réseau commun avec le bot
+
+
   bot:
     container_name: filsgood_bot
     image: python:3.9-slim
@@ -14,16 +26,7 @@ services:
     networks:
      - filsgood_bot_network  # Réseau commun avec Selenium
 
-  selenium:
-    container_name: filsgood_bot-selenium
-    image: selenium/standalone-chrome:latest
-    ports:
-      - "4444:4444"
-    volumes:
-      - /dev/shm:/dev/shm
-    restart: unless-stopped
-    networks:
-      - filsgood_bot_network  # Réseau commun avec le bot
+
 
 networks:
   filsgood_bot_network:
