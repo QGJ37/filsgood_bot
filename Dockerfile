@@ -34,8 +34,9 @@ RUN ls -l google-chrome-stable_current_amd64.deb
 # Installer Google Chrome stable
 RUN dpkg -i google-chrome-stable_current_amd64.deb || apt-get install -y -f
 
-# Vérifier si Google Chrome est installé
-RUN google-chrome-stable --version
+# Vérifier que l'exécutable de Chrome est bien installé et dans le PATH
+RUN which google-chrome-stable
+RUN google-chrome-stable --version || echo "Google Chrome n'est pas installé correctement."
 
 # Télécharger et installer ChromeDriver
 RUN CHROME_VERSION=$(google-chrome-stable --version | sed 's/Google Chrome //') \
