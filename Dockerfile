@@ -24,6 +24,7 @@ RUN apt-get update && apt-get install -y \
     libpng16-16 \
     libglib2.0-0 \
     fonts-liberation \
+    cron \
     && rm -rf /var/lib/apt/lists/*
 
 # Installer Google Chrome stable
@@ -49,17 +50,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copier tous les fichiers du projet dans le conteneur
 COPY . /app/
 
-# Installer cron pour gérer la planification des tâches
-RUN apt-get update && apt-get install -y cron
-
-# Ajouter le fichier cronfile dans le répertoire des tâches cron
+# Copier le fichier cronfile et ajouter les tâches cron
 COPY cronfile /etc/cron.d/filsgood-cron
 
-# Donner les bonnes permissions au fichier cron
-RUN chmod 0644 /etc/cron.d/filsgood-cron
-
-# Appliquer les tâches cron
-RUN crontab /etc/cron.d/filsgood-cron
+# Donner les bonnes permissions au fichier cron et appliquer les tâches cron
+RUN chmod 0644 /etc/cron.d/filsgood-cron \
+    && crontab /etc/cron.d/filsgood-cron
 
 # Exécuter cron en mode foreground
 CMD ["cron", "-f"]
