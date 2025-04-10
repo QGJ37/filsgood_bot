@@ -42,6 +42,7 @@ RUN echo "Vérification de la version de Google Chrome" && \
     wget https://chromedriver.storage.googleapis.com/${CHROME_DRIVER_VERSION}/chromedriver_linux64.zip -O chromedriver_linux64.zip && \
     echo "Téléchargement de ChromeDriver réussi" && \
     unzip chromedriver_linux64.zip -d /usr/local/bin/ && \
+    echo "Extraction de ChromeDriver réussie" && \
     rm chromedriver_linux64.zip && \
     echo "ChromeDriver installé avec succès"
 
