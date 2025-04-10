@@ -1,6 +1,7 @@
 version: "3.8"
 services:
   bot:
+    container_name: filsgood_bot
     image: python:3.9-slim  # Utilise l'image Python officielle
     depends_on:
       - selenium
@@ -12,6 +13,7 @@ services:
     restart: unless-stopped
 
   selenium:
+    container_name: filsgood_bot-selenium
     image: selenium/standalone-chrome:latest
     ports:
       - "4444:4444"
