@@ -1,14 +1,14 @@
 version: "3.8"
 services:
   bot:
-    image: python:3.9-slim  # Utilise l'image Python officielle au lieu de la construire
+    image: python:3.9-slim  # Utilise l'image Python officielle
     depends_on:
       - selenium
     environment:
       - SELENIUM_HOST=selenium
     volumes:
       - /mnt/nvme-data/AppData/filsgood_bot:/app  # Assure-toi que le dossier est bien monté
-    command: ["sh", "-c", "until curl -s selenium:4444/wd/hub/status | grep -q '200'; do echo 'En attente de Selenium...'; sleep 3; done; echo 'Selenium prêt, lancement du bot'; cron -f"]
+    command: ["sh", "-c", "apt-get update && apt-get install -y curl && until curl -s selenium:4444/wd/hub/status | grep -q '200'; do echo 'En attente de Selenium...'; sleep 3; done; echo 'Selenium prêt, lancement du bot'; cron -f"]
     restart: unless-stopped
 
   selenium:
