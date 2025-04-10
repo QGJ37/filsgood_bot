@@ -1,7 +1,7 @@
 # Utiliser une image de base Python légère
 FROM python:3.9-slim
 
-# Mettre à jour le package manager et installer les dépendances nécessaires
+# Ajouter les dépendances nécessaires et le dépôt pour Google Chrome
 RUN apt-get update && apt-get install -y \
     wget \
     curl \
@@ -24,12 +24,16 @@ RUN apt-get update && apt-get install -y \
     libglib2.0-0 \
     fonts-liberation \
     cron \
+    lsb-release \
     && rm -rf /var/lib/apt/lists/*
 
-# Télécharger et installer Google Chrome version stable (124.0.6367.91)
-RUN curl -sSL https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -o google-chrome.deb && \
-    apt-get install -y ./google-chrome.deb && \
-    rm google-chrome.deb
+# Ajouter le dépôt Google Chrome
+RUN curl -sSL https://dl.google.com/linux/linux_signing_key.pub | apt-key add - && \
+    DISTRO=$(lsb_release -c | awk '{print $2}') && \
+    echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ $DISTRO main" | tee /etc/apt/sources.list.d/google-chrome.list
+
+# Installer Google Chrome
+RUN apt-get update && apt-get install -y google-chrome-stable
 
 # Télécharger et installer ChromeDriver compatible (124.0.6367.91)
 RUN CHROMEDRIVER_VERSION=124.0.6367.91 && \
