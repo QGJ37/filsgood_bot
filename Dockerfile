@@ -28,15 +28,14 @@ RUN apt-get update && apt-get install -y \
 # Télécharger Google Chrome
 RUN curl -sSL https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -o google-chrome-stable_current_amd64.deb
 
-# Vérifier si le fichier a bien été téléchargé
-RUN ls -l google-chrome-stable_current_amd64.deb
-
 # Installer Google Chrome stable
 RUN dpkg -i google-chrome-stable_current_amd64.deb || apt-get install -y -f
 
-# Vérifier que l'exécutable de Chrome est bien installé et dans le PATH
-RUN which google-chrome-stable
-RUN google-chrome-stable --version || echo "Google Chrome n'est pas installé correctement."
+# Afficher où Google Chrome est installé
+RUN find / -name "google-chrome-stable"
+
+# Vérifier si le binaire de Google Chrome est bien dans le PATH
+RUN which google-chrome-stable || echo "google-chrome-stable non trouvé"
 
 # Télécharger et installer ChromeDriver
 RUN CHROME_VERSION=$(google-chrome-stable --version | sed 's/Google Chrome //') \
