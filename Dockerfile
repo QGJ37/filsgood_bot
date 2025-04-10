@@ -35,11 +35,16 @@ RUN curl -sSL https://dl.google.com/linux/direct/google-chrome-stable_current_am
 RUN google-chrome-stable --version || echo "Erreur : Google Chrome n'a pas pu être installé"
 
 # Télécharger et installer ChromeDriver correspondant à la version de Google Chrome
-RUN CHROME_VERSION=$(google-chrome-stable --version | sed 's/Google Chrome //') && \
+RUN echo "Vérification de la version de Google Chrome" && \
+    CHROME_VERSION=$(google-chrome-stable --version | sed 's/Google Chrome //') && \
+    echo "Version de Google Chrome : $CHROME_VERSION" && \
     CHROME_DRIVER_VERSION=$(curl -sSL https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_VERSION%.*}) && \
+    echo "Version de ChromeDriver : $CHROME_DRIVER_VERSION" && \
     curl -sSL https://chromedriver.storage.googleapis.com/${CHROME_DRIVER_VERSION}/chromedriver_linux64.zip -o chromedriver_linux64.zip && \
+    ls -l chromedriver_linux64.zip && \
     unzip chromedriver_linux64.zip -d /usr/local/bin/ && \
-    rm chromedriver_linux64.zip
+    rm chromedriver_linux64.zip && \
+    echo "ChromeDriver installé avec succès"
 
 # Définir le répertoire de travail dans le conteneur
 WORKDIR /app
