@@ -29,7 +29,7 @@ def run_bot():
         # Attente de 5 secondes supplémentaires pour s'assurer que le serveur Selenium est prêt
         time.sleep(5)  # Augmentation du délai pour la connexion
         driver = webdriver.Remote(
-            command_executor="http://172.16.10.2:4444/wd/hub",  # Utilisation de l'IP exacte du conteneur Selenium
+            command_executor="http://100.66.245.8:4444/wd/hub",  # Utilisation de l'IP exacte du conteneur Selenium
             desired_capabilities={'browserName': 'chrome'}
         )
         print("Connexion réussie à Selenium.")
