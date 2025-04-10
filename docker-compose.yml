@@ -1,17 +1,19 @@
 services:
   bot:
+    image: python:3.9-slim  # On utilise python:3.9-slim car il est léger et sans conflit
     build:
-      context: .  # Le contexte local au dépôt Git
+      context: .  # Assure-toi que le Dockerfile et tous les fichiers nécessaires sont dans le répertoire
     depends_on:
       - selenium
     environment:
       - SELENIUM_HOST=selenium
-    # Volume supprimé pour éviter les conflits avec Portainer
+    volumes:
+      - /mnt/nvme-data/AppData/filsgood_bot:/app  # Assure-toi que le dossier est bien monté
     command: ["sh", "-c", "until curl -s selenium:4444/wd/hub/status | grep -q '200'; do echo 'En attente de Selenium...'; sleep 3; done; echo 'Selenium prêt, lancement du bot'; cron -f"]
     restart: unless-stopped
 
   selenium:
-    image: selenium/standalone-chrome:latest
+    image: selenium/standalone-chrome:latest  # Image préconfigurée avec Chrome et ChromeDriver
     ports:
       - "4444:4444"
     volumes:
