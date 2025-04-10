@@ -1,8 +1,7 @@
+version: "3.8"
 services:
   bot:
-    image: python:3.9-slim  # On utilise python:3.9-slim car il est léger et sans conflit
-    build:
-      context: .  # Assure-toi que le Dockerfile et tous les fichiers nécessaires sont dans le répertoire
+    image: python:3.9-slim  # Utilise l'image Python officielle au lieu de la construire
     depends_on:
       - selenium
     environment:
@@ -13,7 +12,7 @@ services:
     restart: unless-stopped
 
   selenium:
-    image: selenium/standalone-chrome:latest  # Image préconfigurée avec Chrome et ChromeDriver
+    image: selenium/standalone-chrome:latest
     ports:
       - "4444:4444"
     volumes:
