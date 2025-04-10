@@ -20,7 +20,7 @@ services:
       - SELENIUM_HOST=filsgood_bot-selenium  # Change l'hôte pour le nom du conteneur Selenium
     volumes:
       - /mnt/nvme-data/AppData/filsgood_bot:/app  # Assure-toi que le dossier est bien monté
-    command: ["sh", "-c", "export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get install -y curl cron && cp /app/cronfile /etc/cron.d/filsgood_bot && chmod 0644 /etc/cron.d/filsgood_bot && cron && echo 'cron.* /var/log/cron_custom.log' >> /etc/rsyslog.d/50-default.conf && service rsyslog restart && tail -f /var/log/cron_custom.log"]
+    command: ["sh", "-c", "export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get install -y curl cron && cp /app/cronfile /etc/cron.d/filsgood_bot && chmod 0644 /etc/cron.d/filsgood_bot && cron && mkdir -p /etc/rsyslog.d && echo 'cron.* /var/log/cron_custom.log' >> /etc/rsyslog.d/50-default.conf && service rsyslog restart && tail -f /var/log/cron_custom.log"]
     restart: unless-stopped
     networks:
       - filsgood_bot_network  # Réseau commun avec Selenium
