@@ -2,11 +2,16 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import Select
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import time
+
+def wait_for_element(driver, by, value, timeout=10):
+    return WebDriverWait(driver, timeout).until(EC.presence_of_element_located((by, value)))
 
 def click_next(driver, button_text):
     try:
-        btn = driver.find_element(By.XPATH, f"//button[contains(text(), '{button_text}')]")
+        btn = wait_for_element(driver, By.XPATH, f"//button[contains(text(), '{button_text}')]")
         btn.click()
         time.sleep(1)
     except Exception as e:
@@ -19,14 +24,17 @@ def run_bot():
     options.add_argument("--no-sandbox")  # Utilisé souvent dans des environnements Docker
     # options.add_argument("--start-maximized")  # À supprimer pour headless
 
-    driver = webdriver.Chrome(options=options)
+    driver = webdriver.Remote(
+        command_executor="http://selenium:4444/wd/hub",  # Connexion à Selenium Grid
+        desired_capabilities={'browserName': 'chrome'}
+    )
 
     try:
         driver.get("http://www.filgoods.iftl-ev.fr/")
         time.sleep(3)
 
         # Sélectionner Brest
-        select_element = driver.find_element(By.TAG_NAME, "select")
+        select_element = wait_for_element(driver, By.TAG_NAME, "select")
         select = Select(select_element)
         select.select_by_visible_text("Brest")
         time.sleep(1)
