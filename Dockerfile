@@ -39,8 +39,8 @@ RUN echo "Vérification de la version de Google Chrome" && \
     echo "Version de Google Chrome : $CHROME_VERSION" && \
     CHROME_DRIVER_VERSION=$(curl -sSL https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_VERSION%.*}) && \
     echo "Version de ChromeDriver : $CHROME_DRIVER_VERSION" && \
-    wget https://chromedriver.storage.googleapis.com/${CHROME_DRIVER_VERSION}/chromedriver_linux64.zip -O chromedriver_linux64.zip && \
-    echo "Téléchargement de ChromeDriver réussi" && \
+    curl -O https://chromedriver.storage.googleapis.com/${CHROME_DRIVER_VERSION}/chromedriver_linux64.zip || echo "Erreur de téléchargement de ChromeDriver" && \
+    ls -l chromedriver_linux64.zip && \
     unzip chromedriver_linux64.zip -d /usr/local/bin/ && \
     echo "Extraction de ChromeDriver réussie" && \
     rm chromedriver_linux64.zip && \
