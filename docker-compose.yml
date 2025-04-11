@@ -1,20 +1,7 @@
-version: "3.8"
-
-services:
-  selenium:
-    container_name: filsgood_bot-selenium
-    image: selenium/standalone-chrome:latest
-    ports:
-      - "4444:4444"
-    volumes:
-      - /dev/shm:/dev/shm
-    restart: unless-stopped
-    networks:
-      - filsgood_bot_network
-
   bot:
     container_name: filsgood_bot
     image: python:3.9-slim
+    user: root  # Ajoute cette ligne pour exécuter en root
     depends_on:
       - selenium
     environment:
@@ -43,11 +30,6 @@ services:
           python3 /app/bot.py;
           sleep 60;
         done"
-
     restart: unless-stopped
     networks:
       - filsgood_bot_network
-
-networks:
-  filsgood_bot_network:
-    driver: bridge
