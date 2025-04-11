@@ -1,6 +1,17 @@
 import random
 import time
 import datetime
+import logging
+
+# Configuration du logging vers fichier + stdout (visible dans Portainer)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('/app/filsgood_bot_scheduler.log'),
+        logging.StreamHandler(sys.stdout)
+    ]
+)
 
 def random_time_execution(run_bot):
     # Exécution 4 fois entre 9h et 10h, du lundi au vendredi
@@ -19,11 +30,13 @@ def random_time_execution(run_bot):
 
         # Attente avant d'exécuter le script
         wait_time = (target_time - current_time).total_seconds()
-        print(f"Attente de {wait_time} secondes avant d'exécuter le bot...")
+        logging.info(f"Attente de {wait_time} secondes avant d'exécuter le bot...")
+
         time.sleep(wait_time)
 
         # Appel à la fonction du bot
+        logging.info("Exécution du bot...")
         run_bot()
 
-        # Petite pause entre les exécutions (ajustez si nécessaire)
+        # Petite pause entre les exécutions
         time.sleep(60)
