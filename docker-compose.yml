@@ -36,11 +36,11 @@ services:
           sleep 5;
         done &&
         echo 'Selenium prêt. Lancement en boucle...' &&
-        while true; do
-          echo 'Exécution du bot...';
-          python3 /app/bot.py >> /app/loop.log 2>&1;
-          sleep 60;
-        done"
+    while true; do
+      echo 'Exécution du bot...' &&
+      python3 /app/bot.py;  # <-- plus de redirection ici
+      sleep 60;
+    done"
     restart: unless-stopped
     networks:
       - filsgood_bot_network
