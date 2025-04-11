@@ -39,7 +39,7 @@ services:
     while true; do
       echo 'Exécution du bot...' &&
       python3 /app/bot.py;  # <-- plus de redirection ici
-      sleep 60;
+      sleep 600;
     done"
     restart: unless-stopped
     networks:
