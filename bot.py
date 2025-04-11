@@ -40,6 +40,8 @@ def run_bot():
 
     logging.info("Tentative de connexion à Selenium Grid...")
 
+    driver = None  # Initialisation de driver
+
     try:
         # Attente de 5 secondes supplémentaires pour s'assurer que le serveur Selenium est prêt
         time.sleep(5)
@@ -78,9 +80,10 @@ def run_bot():
         logging.error(f"❌ Erreur lors de la connexion ou de l'exécution du bot : {e}")
 
     finally:
-        time.sleep(3)  # Petite pause pour voir le résultat
-        driver.quit()
-        logging.info("Driver fermé.")
+        if driver:  # S'assurer que driver est initialisé avant de le fermer
+            time.sleep(3)  # Petite pause pour voir le résultat
+            driver.quit()
+            logging.info("Driver fermé.")
 
 if __name__ == "__main__":
     run_bot()
