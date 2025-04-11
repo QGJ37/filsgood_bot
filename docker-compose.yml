@@ -22,22 +22,23 @@ services:
     volumes:
       - /AppData/filsgood_bot:/app
     command: >
-      sh -c "echo 'Mise à jour des paquets...' && \
+      sh -c 'echo "Mise à jour des paquets..." && \
       apt-get update && \
       apt-get install -y curl git python3-pip && \
       pip install selenium && \
       git config --global core.fileMode false && \
       chmod -R 777 /app && \
-      echo 'Suppression du dossier /app s\'il existe...' && \
+      echo "Suppression du dossier /app s\'il existe..." && \
       rm -rf /app/* && \
       git clone https://github.com/QGJ37/filsgood_bot.git /app && \
-      echo 'Vérification de la disponibilité de Selenium...' && \
-      until curl -s http://filsgood_bot-selenium:4444/wd/hub/status | grep -q '\"ready\": true'; do \
-        echo 'En attente de Selenium...'; \
+      echo "Vérification de la disponibilité de Selenium..." && \
+      until curl -s http://filsgood_bot-selenium:4444/wd/hub/status | grep -q "\"ready\": true"; do \
+        echo "En attente de Selenium..."; \
         sleep 5; \
       done && \
-      echo 'Selenium prêt. Lancement en boucle...' && \
-      python3 /app/scheduler.py"
+      echo "Selenium prêt. Lancement en boucle..." && \
+      python3 /app/scheduler.py'
+
 
     restart: unless-stopped
     networks:
