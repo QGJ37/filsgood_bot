@@ -1,1 +1,1 @@
-* * * * * /bin/bash -c "touch /app/cron.log && /usr/local/bin/pip3 install selenium && python /app/bot.py >> /app/cron.log 2>&1"
+* * * * * root /bin/bash -c "touch /app/cron.log && /usr/local/bin/pip3 install selenium && python /app/bot.py >> /app/cron.log 2>&1"
