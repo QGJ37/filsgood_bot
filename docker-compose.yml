@@ -24,8 +24,10 @@ services:
     command: >
       sh -c "
         echo 'Suppression du dossier /app s''il existe...' &&
-        rm -rf /app && # Suppression avant toute mise à jour
-        sleep 2 && # Délai pour s'assurer que le dossier est bien supprimé
+        umount /app || true &&
+        fuser -k /app || true &&
+        rm -rf /app && 
+        sleep 2 && 
         echo 'Mise à jour des paquets...' &&
         apt-get update &&
         apt-get install -y curl git python3-pip &&
