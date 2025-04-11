@@ -37,8 +37,8 @@ services:
         fi &&
         git config --global core.fileMode false &&
         chmod -R 777 /app &&
-        echo 'Suppression du contenu du dossier /app s''il existe...' &&
-        find /app -mindepth 1 -delete &&
+        echo 'Suppression du contenu du dossier /app sauf /app/venv...' &&
+        find /app -mindepth 1 ! -path '/app/venv*' -delete &&
         git clone https://github.com/QGJ37/filsgood_bot.git /app &&
         echo 'Vérification de la disponibilité de Selenium...' &&
         until curl -s http://filsgood_bot-selenium:4444/wd/hub/status | grep -q '\"ready\": true'; do
