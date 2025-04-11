@@ -13,7 +13,7 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('/app/cron_custom.log'),
+        logging.FileHandler('/app/filsgood_bot.log'),
         logging.StreamHandler(sys.stdout)
     ]
 )
