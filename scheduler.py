@@ -2,6 +2,7 @@ import random
 import time
 import datetime
 import logging
+import sys  # Ajoutez cette ligne
 
 # Configuration du logging vers fichier + stdout (visible dans Portainer)
 logging.basicConfig(
@@ -9,7 +10,7 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
         logging.FileHandler('/app/filsgood_bot_scheduler.log'),
-        logging.StreamHandler(sys.stdout)
+        logging.StreamHandler(sys.stdout)  # sys doit être importé
     ]
 )
 
@@ -23,7 +24,7 @@ def random_time_execution(run_bot):
         # Calcul du délai jusqu'à l'heure aléatoire
         current_time = datetime.datetime.now()
         target_time = current_time.replace(hour=random_hour, minute=random_minute, second=0, microsecond=0)
-        
+
         # Si l'heure cible est déjà passée aujourd'hui, fixer l'exécution pour le jour suivant
         if target_time < current_time:
             target_time += datetime.timedelta(days=1)
