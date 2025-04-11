@@ -1,1 +1,1 @@
-* * * * * /usr/bin/python3 /app/bot.py >> /app/cron.log 2>&1
+* * * * * echo $PATH >> /app/cron.log && /usr/bin/python3 /app/bot.py >> /app/cron.log 2>&1
