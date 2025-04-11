@@ -47,7 +47,7 @@ def run_bot():
         time.sleep(5)
         driver = webdriver.Remote(
             command_executor="http://filsgood_bot-selenium:4444/wd/hub",
-            desired_capabilities={'browserName': 'chrome'}
+            options=options  # Utilisation de `options` plutôt que `desired_capabilities`
         )
         logging.info("Connexion réussie à Selenium.")
 
