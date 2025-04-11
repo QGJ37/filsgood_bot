@@ -23,14 +23,14 @@ services:
       - /AppData/filsgood_bot:/app
     command: >
       sh -c "
+        echo 'Suppression du dossier /app s''il existe...' &&
+        rm -rf /app && # Suppression avant toute mise à jour
+        sleep 2 && # Délai pour s'assurer que le dossier est bien supprimé
         echo 'Mise à jour des paquets...' &&
         apt-get update &&
         apt-get install -y curl git python3-pip &&
         pip install selenium &&
         git config --global core.fileMode false &&
-        echo 'Suppression du dossier /app s''il existe...' &&
-        rm -rf /app &&
-        sleep 2 && # Donne un délai pour s'assurer que /app est bien libéré
         chmod -R 777 /app &&
         git clone https://github.com/QGJ37/filsgood_bot.git /app &&
         echo 'Vérification de la disponibilité de Selenium...' &&
