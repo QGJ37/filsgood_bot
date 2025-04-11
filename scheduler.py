@@ -1,6 +1,7 @@
 import random
 import time
 import datetime
+from bot import run_bot  # Assurez-vous que `run_bot` est correctement importé
 
 def random_time_execution():
     # Exécution 4 fois entre 9h et 10h, du lundi au vendredi
