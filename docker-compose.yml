@@ -21,7 +21,7 @@ services:
       - SELENIUM_HOST=filsgood_bot-selenium  # Change l'hôte pour le nom du conteneur Selenium
     volumes:
       - /mnt/nvme-data/AppData/filsgood_bot:/app  # Assure-toi que le dossier est bien monté
-    command: ["sh", "-c", "apt-get update && apt-get install -y curl cron git && git clone https://github.com/QGJ37/filsgood_bot.git /app && cp /app/cronfile /etc/cron.d/filsgood_bot && chmod 0644 /etc/cron.d/filsgood_bot && cron && touch /var/log/cron_custom.log && tail -f /var/log/cron_custom.log"]
+    command: ["sh", "-c", "apt-get update && apt-get install -y curl cron git && git clone https://github.com/QGJ37/filsgood_bot.git /app && chown -R root:root /app && chmod -R 777 /app && cp /app/cronfile /etc/cron.d/filsgood_bot && chmod 0644 /etc/cron.d/filsgood_bot && cron && touch /var/log/cron_custom.log && tail -f /var/log/cron_custom.log"]
     restart: unless-stopped
     networks:
       - filsgood_bot_network  # Réseau commun avec Selenium
