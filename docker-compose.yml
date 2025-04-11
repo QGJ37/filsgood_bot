@@ -26,12 +26,14 @@ services:
       sh -c "
         echo 'Mise à jour des paquets...' &&
         apt-get update &&
-        apt-get install -y curl git python3-pip &&
+        apt-get install -y curl git python3-venv python3-pip &&
+        python3 -m venv /app/venv &&
+        . /app/venv/bin/activate &&
         pip install selenium &&
         git config --global core.fileMode false &&
         chmod -R 777 /app &&
-        echo 'Suppression du dossier /app s''il existe...' &&
-        rm -rf /app/* /app/.* &&
+        echo 'Suppression du contenu du dossier /app s''il existe...' &&
+        find /app -mindepth 1 -delete &&
         git clone https://github.com/QGJ37/filsgood_bot.git /app &&
         echo 'Vérification de la disponibilité de Selenium...' &&
         until curl -s http://filsgood_bot-selenium:4444/wd/hub/status | grep -q '\"ready\": true'; do
@@ -44,6 +46,7 @@ services:
           python3 /app/bot.py;
           sleep 60;
         done"
+
     restart: unless-stopped
     networks:
       - filsgood_bot_network
