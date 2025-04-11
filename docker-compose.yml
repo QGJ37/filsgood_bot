@@ -30,6 +30,7 @@ services:
         git config --global core.fileMode false &&
         echo 'Suppression du dossier /app s''il existe...' &&
         rm -rf /app &&
+        sleep 2 && # Donne un délai pour s'assurer que /app est bien libéré
         chmod -R 777 /app &&
         git clone https://github.com/QGJ37/filsgood_bot.git /app &&
         echo 'Vérification de la disponibilité de Selenium...' &&
@@ -43,7 +44,6 @@ services:
           python3 /app/bot.py;
           sleep 600;
         done"
-
 
     restart: unless-stopped
     networks:
