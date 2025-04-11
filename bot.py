@@ -86,4 +86,4 @@ def run_bot():
             logging.info("Driver fermé.")
 
 if __name__ == "__main__":
-    random_time_execution()  # Exécution du bot selon l'heure aléatoire
+    random_time_execution(run_bot)  # Exécution du bot selon l'heure aléatoire
