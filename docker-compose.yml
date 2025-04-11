@@ -42,7 +42,9 @@ services:
         done &&
         echo 'Selenium prêt. Lancement en boucle...' &&
         while true; do
-          echo 'Exécution du bot...';
+          echo 'Exécution du bot...' &&
+          . /app/venv/bin/activate &&
+          pip list &&  # Ajouté pour vérifier les packages installés
           python3 /app/bot.py;
           sleep 60;
         done"
