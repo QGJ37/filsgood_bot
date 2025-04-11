@@ -2,4 +2,5 @@
 # La minute est générée aléatoirement entre 0 et 59
 
 
-0-59 9-10 * * 1-5 root bash -c 'sleep $((RANDOM % 3600)); cd /app && python bot.py' >> /var/log/cron_custom.log 2>&1
+0-59 9-10 * * 1-5 root bash -c 'echo "$(date) - Début de l\'exécution du bot" >> /var/log/cron_custom.log; sleep $((RANDOM % 3600)); cd /app && python bot.py && echo "$(date) - Exécution du bot terminée" >> /var/log/cron_custom.log' >> /var/log/cron_custom.log 2>&1
+
