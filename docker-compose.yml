@@ -41,7 +41,7 @@ services:
         while true; do
           echo 'Exécution du bot...';
           python3 /app/bot.py;
-          sleep 600;
+          sleep 60;
         done"
 
     restart: unless-stopped
