@@ -7,8 +7,9 @@ from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-# Configuration du logging
+# Configuration du logging pour écrire dans un fichier
 logging.basicConfig(
+    filename='/app/cron_custom.log',  # Spécifie le fichier de log
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
