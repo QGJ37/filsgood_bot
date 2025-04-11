@@ -21,8 +21,7 @@ services:
       - SELENIUM_HOST=filsgood_bot-selenium
     volumes:
       - /AppData/filsgood_bot:/app
-    command: ["sh", "-c", "echo 'Mise à jour des paquets...'; apt-get update && apt-get install -y curl cron git && echo 'Configuration de Git...'; git config --global core.fileMode false && echo 'Changement des permissions sur /app...'; chmod -R 777 /app && echo 'Clonage du dépôt...'; git clone https://github.com/QGJ37/filsgood_bot.git /app && echo 'Vérification de la disponibilité de Selenium...'; until curl -s http://filsgood_bot-selenium:4444/wd/hub/status | grep -q '\"ready\": true'; do echo 'En attente de Selenium...'; sleep 5; done; echo 'Selenium prêt, lancement du bot'; cp /app/cronfile /etc/cron.d/filsgood_bot && chmod 0644 /etc/cron.d/filsgood_bot && echo 'Démarrage du cron...'; cron && echo 'Création du fichier de log...'; touch /app/cron_custom.log && echo 'Affichage des logs...'; tail -f /app/cron_custom.log"]
-
+    command: ["sh", "-c", "echo 'Mise à jour des paquets...'; apt-get update && apt-get install -y curl cron git python3-pip && pip install selenium && echo 'Configuration de Git...'; git config --global core.fileMode false && echo 'Changement des permissions sur /app...'; chmod -R 777 /app && echo 'Clonage du dépôt...'; git clone https://github.com/QGJ37/filsgood_bot.git /app && echo 'Vérification de la disponibilité de Selenium...'; until curl -s http://filsgood_bot-selenium:4444/wd/hub/status | grep -q '\"ready\": true'; do echo 'En attente de Selenium...'; sleep 5; done; echo 'Selenium prêt, lancement du bot'; cp /app/cronfile /etc/cron.d/filsgood_bot && chmod 0644 /etc/cron.d/filsgood_bot && echo 'Démarrage du cron...'; cron && echo 'Création du fichier de log...'; touch /app/cron_custom.log && echo 'Affichage des logs...'; tail -f /app/cron_custom.log"]
     restart: unless-stopped
     networks:
       - filsgood_bot_network
