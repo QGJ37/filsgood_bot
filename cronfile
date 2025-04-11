@@ -1,7 +1,6 @@
 # Exécute le bot 4 fois par jour, entre 9h et 10h, du lundi au vendredi
 # La minute est générée aléatoirement entre 0 et 59
 
-* * * * * root bash -c 'env; echo "$(date) - Test de l\'exécution du bot" >> /var/log/cron_custom.log; cd /app && python bot.py >> /var/log/cron_custom.log 2>&1; echo "$(date) - Fin de l\'exécution du bot" >> /var/log/cron_custom.log'
+* * * * * root bash -c 'env; echo "$(date) - Test de l\'exécution du bot" >> /app/cron_custom.log; cd /app && python bot.py >> /app/cron_custom.log 2>&1; echo "$(date) - Fin de l\'exécution du bot" >> /app/cron_custom.log'
 
-# 0-59 9-10 * * 1-5 root bash -c 'echo "$(date) - Début de l\'exécution du bot" >> /var/log/cron_custom.log; sleep $((RANDOM % 3600)); cd /app && python bot.py && echo "$(date) - Exécution du bot terminée" >> /var/log/cron_custom.log' >> /var/log/cron_custom.log 2>&1
-
+# 0-59 9-10 * * 1-5 root bash -c 'echo "$(date) - Début de l\'exécution du bot" >> /app/cron_custom.log; sleep $((RANDOM % 3600)); cd /app && python bot.py && echo "$(date) - Exécution du bot terminée" >> /app/cron_custom.log' >> /app/cron_custom.log 2>&1
