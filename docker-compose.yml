@@ -38,11 +38,7 @@ services:
           sleep 5;
         done &&
         echo 'Selenium prêt. Lancement en boucle...' &&
-        while true; do
-          echo 'Exécution du bot...';
-          python3 /app/bot.py;
-          sleep 600;
-        done"
+        python3 /app/scheduler.py"  # Exécution de scheduler.py
 
     restart: unless-stopped
     networks:
