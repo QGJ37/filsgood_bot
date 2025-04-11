@@ -40,6 +40,7 @@ services:
         echo 'Selenium prêt. Lancement en boucle...' &&
         python3 /app/scheduler.py"  # Exécution de scheduler.py
 
+
     restart: unless-stopped
     networks:
       - filsgood_bot_network
