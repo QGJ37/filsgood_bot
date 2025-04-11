@@ -27,9 +27,14 @@ services:
         echo 'Mise à jour des paquets...' &&
         apt-get update &&
         apt-get install -y curl git python3-venv python3-pip &&
-        python3 -m venv /app/venv &&
-        . /app/venv/bin/activate &&
-        pip install selenium &&
+        if [ ! -d /app/venv ]; then
+          echo 'Création de l''environnement virtuel...' &&
+          python3 -m venv /app/venv &&
+          . /app/venv/bin/activate &&
+          pip install selenium;
+        else
+          echo 'Environnement virtuel déjà existant...';
+        fi &&
         git config --global core.fileMode false &&
         chmod -R 777 /app &&
         echo 'Suppression du contenu du dossier /app s''il existe...' &&
@@ -44,11 +49,9 @@ services:
         while true; do
           echo 'Exécution du bot...' &&
           . /app/venv/bin/activate &&
-          pip list &&  # Ajouté pour vérifier les packages installés
           python3 /app/bot.py;
           sleep 60;
         done"
-
     restart: unless-stopped
     networks:
       - filsgood_bot_network
