@@ -2,7 +2,7 @@ import time
 import random
 import datetime
 import logging
-from bot import run_bot  # À adapter si nécessaire
+from bot import run_bot  # On importe ici car il n'y a plus d'import croisé
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -24,7 +24,6 @@ def random_time_execution(run_bot):
             time.sleep(wait_time)
             continue
 
-        # Générer les 4 horaires aléatoires entre 9h00 et 9h59
         random_minutes = sorted(random.sample(range(60), 4))
         now = datetime.datetime.now()
         execution_times = [now.replace(hour=9, minute=m, second=0, microsecond=0) for m in random_minutes]
@@ -45,7 +44,6 @@ def random_time_execution(run_bot):
             run_bot()
             time.sleep(60)
 
-        # Attente jusqu'au lendemain à 9h00
         next_day = datetime.datetime.now() + datetime.timedelta(days=1)
         next_start = next_day.replace(hour=9, minute=0, second=0, microsecond=0)
         wait_time = (next_start - datetime.datetime.now()).total_seconds()
