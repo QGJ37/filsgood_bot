@@ -22,9 +22,7 @@ logging.basicConfig(
 )
 
 def random_time_execution(run_bot):
-    logging.info("Exécution immédiate du bot lors du lancement du conteneur...")
-    run_bot()
-    time.sleep(60)
+    logging.info("Vérification de l'heure et du weekend avant exécution...")
 
     while True:
         today = datetime.datetime.now()
@@ -57,7 +55,7 @@ def random_time_execution(run_bot):
                 time.sleep(wait_time)
 
             logging.info(f"--- Lancement du bot à {datetime.datetime.now().strftime('%H:%M:%S')} ---")
-            run_bot()
+            run_bot()  # Exécution du bot à l'heure prévue
             time.sleep(60)
 
         # Attendre jusqu'au lendemain à 9h pour redémarrer la boucle
