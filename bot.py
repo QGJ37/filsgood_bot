@@ -7,7 +7,6 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from scheduler import random_time_execution  # Importer la fonction du scheduler
 
 # Configuration du logging vers fichier + stdout (visible dans Portainer)
 logging.basicConfig(
@@ -84,6 +83,3 @@ def run_bot():
             time.sleep(3)
             driver.quit()
             logging.info("Driver fermé.")
-
-if __name__ == "__main__":
-    random_time_execution(run_bot)  # Exécution du bot selon l'heure aléatoire
