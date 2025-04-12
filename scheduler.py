@@ -1,58 +1,56 @@
-import random
 import time
+import random
 import datetime
 import logging
-import sys  # Ajoutez cette ligne
+from bot import run_bot  # À adapter si nécessaire
 
-# Configuration du logging vers fichier + stdout (visible dans Portainer)
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('/app/filsgood_bot_scheduler.log'),
-        logging.StreamHandler(sys.stdout)  # sys doit être importé
-    ]
-)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def random_time_execution(run_bot):
-    # Exécution immédiate du bot lors du lancement du conteneur
     logging.info("Exécution immédiate du bot lors du lancement du conteneur...")
     run_bot()
-    time.sleep(60)  # Petite pause avant de commencer la logique d'exécution
+    time.sleep(60)
 
-    # Exécution 4 fois entre 9h et 10h, du lundi au vendredi
     while True:
-        for _ in range(4):
-            # Calcul de l'heure aléatoire
-            random_minute = random.randint(0, 59)
-            random_hour = 9  # 9h (dans la plage 9h-10h)
+        today = datetime.datetime.now()
+        weekday = today.weekday()
 
-            # Calcul du délai jusqu'à l'heure aléatoire
-            current_time = datetime.datetime.now()
-            target_time = current_time.replace(hour=random_hour, minute=random_minute, second=0, microsecond=0)
-
-            # Si l'heure cible est déjà passée aujourd'hui, fixer l'exécution pour le jour suivant
-            if target_time < current_time:
-                target_time += datetime.timedelta(days=1)
-
-            # Attente avant d'exécuter le script
-            wait_time = (target_time - current_time).total_seconds()
-            logging.info(f"Attente de {wait_time} secondes avant d'exécuter le bot...")
-
+        if weekday >= 5:
+            days_until_monday = (7 - weekday)
+            next_monday = today + datetime.timedelta(days=days_until_monday)
+            next_monday = next_monday.replace(hour=9, minute=0, second=0, microsecond=0)
+            wait_time = (next_monday - today).total_seconds()
+            logging.info("Weekend détecté. Attente jusqu'à lundi 9h...")
             time.sleep(wait_time)
+            continue
 
-            # Appel à la fonction du bot
-            logging.info("Exécution du bot...")
+        # Générer les 4 horaires aléatoires entre 9h00 et 9h59
+        random_minutes = sorted(random.sample(range(60), 4))
+        now = datetime.datetime.now()
+        execution_times = [now.replace(hour=9, minute=m, second=0, microsecond=0) for m in random_minutes]
+        execution_times = [t if t > now else t + datetime.timedelta(days=1) for t in execution_times]
+
+        readable_times = [t.strftime("%H:%M") for t in execution_times]
+        logging.info(f"Horaires choisis pour aujourd'hui : {', '.join(readable_times)}")
+
+        for exec_time in execution_times:
+            now = datetime.datetime.now()
+            wait_time = (exec_time - now).total_seconds()
+
+            if wait_time > 0:
+                logging.info(f"Attente de {wait_time:.0f} secondes avant exécution à {exec_time.strftime('%H:%M')}...")
+                time.sleep(wait_time)
+
+            logging.info(f"--- Lancement du bot à {datetime.datetime.now().strftime('%H:%M:%S')} ---")
             run_bot()
-
-            # Petite pause entre les exécutions
             time.sleep(60)
 
-        # Attendre jusqu'au lundi suivant
-        now = datetime.datetime.now()
-        days_until_monday = (7 - now.weekday()) % 7
-        next_monday = now + datetime.timedelta(days=days_until_monday)
-        next_monday = next_monday.replace(hour=9, minute=0, second=0, microsecond=0)
-        wait_time = (next_monday - now).total_seconds()
-        logging.info(f"Attente jusqu'au lundi suivant à 9h...")
+        # Attente jusqu'au lendemain à 9h00
+        next_day = datetime.datetime.now() + datetime.timedelta(days=1)
+        next_start = next_day.replace(hour=9, minute=0, second=0, microsecond=0)
+        wait_time = (next_start - datetime.datetime.now()).total_seconds()
+        logging.info("Journée terminée. Attente jusqu'à demain 9h...")
         time.sleep(wait_time)
+
+if __name__ == "__main__":
+    random_time_execution(run_bot)
