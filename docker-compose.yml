@@ -48,13 +48,9 @@ services:
           echo 'En attente de Selenium...';
           sleep 5;
         done &&
-        echo 'Selenium prêt. Lancement en boucle...' &&
-        while true; do
-          echo 'Exécution du bot...' &&
-          . /app/venv/bin/activate &&
-          python3 /app/bot.py;
-          sleep 60;
-        done"
+        echo 'Selenium prêt. Lancement du planificateur...' &&
+        . /app/venv/bin/activate &&
+        python3 /app/scheduler.py"
     restart: unless-stopped
     networks:
       - filsgood_bot_network
