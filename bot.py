@@ -7,13 +7,19 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from logging.handlers import RotatingFileHandler
 
-# Configuration du logging vers fichier + stdout (visible dans Portainer)
+# Configuration du logging avec rotation des logs
+log_handler = RotatingFileHandler('/app/filsgood_bot.log', maxBytes=10*1024*1024, backupCount=7)
+log_handler.setLevel(logging.INFO)
+log_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+log_handler.setFormatter(log_formatter)
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('/app/filsgood_bot.log'),
+        log_handler,
         logging.StreamHandler(sys.stdout)
     ]
 )
@@ -83,8 +89,7 @@ def run_bot():
             time.sleep(3)
             driver.quit()
             logging.info("Driver fermé.")
-            
+
 # Retirer cette ligne qui lance le bot immédiatement
 # if __name__ == "__main__":
 #     run_bot()  # Lancement immédiat du bot (pour le test)
-
