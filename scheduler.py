@@ -4,7 +4,15 @@ import datetime
 import logging
 from bot import run_bot  # On importe ici car il n'y a plus d'import croisé
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# Configuration du logging vers fichier + stdout (visible dans Portainer)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('/app/filsgood_bot.log'),
+        logging.StreamHandler(sys.stdout)
+    ]
+)
 
 def random_time_execution(run_bot):
     logging.info("Exécution immédiate du bot lors du lancement du conteneur...")
