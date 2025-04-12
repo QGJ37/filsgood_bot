@@ -83,3 +83,6 @@ def run_bot():
             time.sleep(3)
             driver.quit()
             logging.info("Driver fermé.")
+
+if __name__ == "__main__":
+    run_bot()  # Lancement immédiat du bot (pour le test)
