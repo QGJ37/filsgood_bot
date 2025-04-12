@@ -30,16 +30,17 @@ def random_time_execution(run_bot):
         today = datetime.datetime.now()
         weekday = today.weekday()
 
-        if weekday >= 5:
+        if weekday >= 5:  # Si c'est le weekend (samedi ou dimanche)
             days_until_monday = (7 - weekday)
             next_monday = today + datetime.timedelta(days=days_until_monday)
             next_monday = next_monday.replace(hour=9, minute=0, second=0, microsecond=0)
             wait_time = (next_monday - today).total_seconds()
-            logging.info("Weekend détecté. Attente jusqu'à lundi 9h...")
-            time.sleep(wait_time)
-            continue
+            logging.info(f"Weekend détecté. Attente jusqu'à lundi 9h... (dans {wait_time} secondes)")
+            time.sleep(wait_time)  # Attente jusqu'à lundi matin à 9h
+            continue  # Reprendre la boucle après le weekend
 
-        random_minutes = sorted(random.sample(range(60), 4))
+        # Pendant la semaine (lundi à vendredi)
+        random_minutes = sorted(random.sample(range(60), 4))  # Générer des minutes aléatoires pour les exécutions
         now = datetime.datetime.now()
         execution_times = [now.replace(hour=9, minute=m, second=0, microsecond=0) for m in random_minutes]
         execution_times = [t if t > now else t + datetime.timedelta(days=1) for t in execution_times]
@@ -59,10 +60,11 @@ def random_time_execution(run_bot):
             run_bot()
             time.sleep(60)
 
+        # Attendre jusqu'au lendemain à 9h pour redémarrer la boucle
         next_day = datetime.datetime.now() + datetime.timedelta(days=1)
         next_start = next_day.replace(hour=9, minute=0, second=0, microsecond=0)
         wait_time = (next_start - datetime.datetime.now()).total_seconds()
-        logging.info("Journée terminée. Attente jusqu'à demain 9h...")
+        logging.info(f"Journée terminée. Attente jusqu'à demain 9h... (dans {wait_time} secondes)")
         time.sleep(wait_time)
 
 if __name__ == "__main__":
