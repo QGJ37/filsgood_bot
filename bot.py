@@ -1,4 +1,4 @@
-voyerimport logging
+import logging
 import sys
 import time
 from selenium import webdriver
