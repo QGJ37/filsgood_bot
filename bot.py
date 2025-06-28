@@ -1,4 +1,4 @@
-import logging
+voyerimport logging
 import sys
 import time
 from selenium import webdriver
@@ -77,7 +77,7 @@ def run_bot():
         click_next(driver, "Aucun")
         click_next(driver, "8h-16h")
         click_next(driver, "En bonne forme")
-        click_next(driver, "Voir resultat")
+        click_next(driver, "Envoyer le formulaire")
 
         logging.info("✅ Questionnaire complété avec succès.")
 
