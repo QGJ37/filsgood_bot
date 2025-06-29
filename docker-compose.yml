@@ -32,7 +32,7 @@ services:
           python3 -m venv /app/venv;
         fi &&
         /app/venv/bin/pip install --upgrade pip &&
-        /app/venv/bin/pip install --no-cache-dir selenium requests &&
+        /app/venv/bin/pip install --no-cache-dir selenium requests python-telegram-bot==13.15 &&
         git config --global core.fileMode false &&
         chmod -R 777 /app &&
         find /app -mindepth 1 ! -path '/app/venv*' -delete &&
@@ -43,6 +43,7 @@ services:
           sleep 5;
         done &&
         /app/venv/bin/python /app/scheduler.py"
+
     restart: unless-stopped
     networks:
       - filsgood_bot_network
