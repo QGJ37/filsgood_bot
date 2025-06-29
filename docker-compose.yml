@@ -5,7 +5,7 @@ services:
     container_name: filsgood_bot-selenium
     image: selenium/standalone-chrome:latest
     ports:
-      - "4444:4444"   # Port Selenium exposé
+      - "4444:4444"
     volumes:
       - /dev/shm:/dev/shm
     restart: unless-stopped
@@ -15,47 +15,33 @@ services:
   bot:
     container_name: filsgood_bot
     image: python:3.9-slim
-    user: root  # Pour avoir les droits root
+    user: root
     depends_on:
       - selenium
     environment:
       - SELENIUM_HOST=filsgood_bot-selenium
-      - TELEGRAM_BOT_TOKEN
-      - TELEGRAM_CHAT_ID
+      # ajoute ici tes variables d'environnement si besoin
     volumes:
       - /AppData/filsgood_bot:/app
     command: >
       sh -c "
-        set -e &&
         apt-get update &&
         apt-get install -y curl git python3-venv python3-pip &&
-    
         if [ ! -d /app/venv ]; then
           python3 -m venv /app/venv &&
-          . /app/venv/bin/activate &&
-          pip install --upgrade pip &&
-          pip install selenium requests;
-        else
-          . /app/venv/bin/activate;
+          /app/venv/bin/pip install --upgrade pip &&
+          /app/venv/bin/pip install selenium requests;
         fi &&
-    
         git config --global core.fileMode false &&
         chmod -R 777 /app &&
-    
         find /app -mindepth 1 ! -path '/app/venv*' -delete &&
-    
         git clone https://github.com/QGJ37/filsgood_bot.git /app/bot_code &&
         mv /app/bot_code/* /app/ &&
         rm -rf /app/bot_code &&
-    
         until curl -s http://filsgood_bot-selenium:4444/wd/hub/status | grep -q '\"ready\": true'; do
           sleep 5;
         done &&
-    
-        /app/venv/bin/python /app/scheduler.py
-      "
-
-
+        /app/venv/bin/python /app/scheduler.py"
     restart: unless-stopped
     networks:
       - filsgood_bot_network
