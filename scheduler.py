@@ -98,24 +98,28 @@ def run_bot():
         driver.get("http://www.filgoods.iftl-ev.fr/")
         time.sleep(3)
 
-        select_element = wait_for_element(driver, By.TAG_NAME, "select")
+        logging.debug("Sélection de la ville 'Brest'")
+        select_element = wait_for_element(driver, By.ID, "ville")
         select = Select(select_element)
         select.select_by_visible_text("Brest")
         logging.info("Option 'Brest' sélectionnée.")
         time.sleep(1)
 
-        click_next(driver, "Confirm")
-        click_next(driver, "Bien dormi(>8h)")
-        click_next(driver, "Aucune")
-        click_next(driver, "Aucun")
-        click_next(driver, "Aucune")
-        click_next(driver, "Aucune")
-        click_next(driver, "Aucun")
-        click_next(driver, "8h-16h")
-        click_next(driver, "En bonne forme")
-        click_next(driver, "Envoyer le formulaire")
+        for btn_text in [
+            "Confirm", "Bien dormi(>8h)", "Aucune", "Aucun", "Aucune",
+            "Aucune", "Aucun", "8h-16h", "En bonne forme"
+        ]:
+            click_next(driver, btn_text)
 
-        logging.info("✅ Questionnaire complété avec succès.")
+        logging.debug("Recherche du bouton 'Envoyer le formulaire'")
+        submit_button = wait_for_element(
+            driver, By.XPATH, "//input[@type='submit' and @value='Envoyer le formulaire']"
+        )
+        submit_button.click()
+        logging.info("Clic sur le bouton 'Envoyer le formulaire' effectué.")
+        time.sleep(1)
+
+        send_telegram_alert("✅ Formulaire soumis avec succès !")
 
     except Exception as e:
         logging.error(f"❌ Erreur lors de l'exécution du bot : {e}")
