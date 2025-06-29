@@ -5,7 +5,7 @@ from datetime import datetime
 from logging.handlers import RotatingFileHandler
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
 import telegram
 import os
@@ -57,14 +57,15 @@ def run_bot():
 
     try:
         driver = webdriver.Remote(
-            command_executor="http://filsgood_bot-selenium:4444/wd/hub",  # <-- Correction ici
+            command_executor="http://filsgood_bot-selenium:4444/wd/hub",
             options=options
         )
 
         driver.get("http://www.filgoods.iftl-ev.fr/")
         time.sleep(3)
 
-        select_element = wait_for_element(driver, By.TAG_NAME, "select")
+        # Cibler le select par ID, plus fiable que par tag_name
+        select_element = wait_for_element(driver, By.ID, "ville")
         select = Select(select_element)
         select.select_by_visible_text("Brest")
         logging.info("Option 'Brest' sélectionnée.")
