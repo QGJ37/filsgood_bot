@@ -58,6 +58,7 @@ def wait_for_element(driver, by, value, timeout=10):
         return element
     except Exception as e:
         logging.error(f"Erreur lors de la recherche de l'élément {value} : {e}")
+        send_telegram_alert(f"Erreur lors de la recherche de l'élément {value} : {e}")
         raise
 
 # ⏭️ Clic sur un bouton
