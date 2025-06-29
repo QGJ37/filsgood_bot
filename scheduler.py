@@ -1,31 +1,36 @@
+import time
+import random
+import datetime
 import logging
 import sys
-import time
 import os
 import requests
+from logging.handlers import RotatingFileHandler
+from zoneinfo import ZoneInfo
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import Select, WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from logging.handlers import RotatingFileHandler
 
-# Logging avec rotation (10 Mo, 7 backups)
+# --- Configuration ---
+
+PARIS_TZ = ZoneInfo("Europe/Paris")
+
 log_handler = RotatingFileHandler('/app/filsgood_bot.log', maxBytes=10*1024*1024, backupCount=7)
-log_handler.setLevel(logging.DEBUG)  # Niveau DEBUG pour log détaillé
+log_handler.setLevel(logging.INFO)
 log_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 log_handler.setFormatter(log_formatter)
 
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[
-        log_handler,
-        logging.StreamHandler(sys.stdout)
-    ]
+    handlers=[log_handler, logging.StreamHandler(sys.stdout)]
 )
 
-# Notification Telegram
+# --- Telegram notifications ---
+
 def send_telegram_alert(message):
     token = os.environ.get("TELEGRAM_BOT_TOKEN")
     chat_id = os.environ.get("TELEGRAM_CHAT_ID")
@@ -35,10 +40,7 @@ def send_telegram_alert(message):
         return
 
     url = f"https://api.telegram.org/bot{token}/sendMessage"
-    data = {
-        "chat_id": chat_id,
-        "text": message
-    }
+    data = {"chat_id": chat_id, "text": message}
 
     try:
         response = requests.post(url, data=data)
@@ -49,11 +51,13 @@ def send_telegram_alert(message):
     except Exception as e:
         logging.error(f"Erreur lors de l'envoi Telegram : {e}")
 
-# Attente d'un élément
+# --- Selenium helpers ---
+
 def wait_for_element(driver, by, value, timeout=10):
     try:
-        logging.debug(f"Attente élément {value} par {by} (timeout {timeout}s)")
-        element = WebDriverWait(driver, timeout).until(EC.presence_of_element_located((by, value)))
+        element = WebDriverWait(driver, timeout).until(
+            EC.presence_of_element_located((by, value))
+        )
         logging.info(f"Élément trouvé : {value}")
         return element
     except Exception as e:
@@ -61,10 +65,8 @@ def wait_for_element(driver, by, value, timeout=10):
         send_telegram_alert(f"❌ Erreur lors de la recherche de l'élément {value} : {e}")
         raise
 
-# Clic sur un bouton
 def click_next(driver, button_text):
     try:
-        logging.debug(f"Tentative clic sur bouton contenant '{button_text}'")
         btn = wait_for_element(driver, By.XPATH, f"//button[contains(text(), '{button_text}')]")
         btn.click()
         logging.info(f"Clic sur le bouton '{button_text}' effectué.")
@@ -72,8 +74,10 @@ def click_next(driver, button_text):
     except Exception as e:
         logging.error(f"Erreur lors du clic sur '{button_text}' : {e}")
         send_telegram_alert(f"❌ Erreur lors du clic sur '{button_text}' : {e}")
+        raise
 
-# Routine principale du bot
+# --- Fonction principale du bot ---
+
 def run_bot():
     options = Options()
     options.add_argument("--headless")
@@ -114,8 +118,9 @@ def run_bot():
         logging.info("✅ Questionnaire complété avec succès.")
 
     except Exception as e:
-        logging.error(f"❌ Erreur lors de la connexion ou de l'exécution du bot : {e}")
+        logging.error(f"❌ Erreur lors de l'exécution du bot : {e}")
         send_telegram_alert(f"❌ Erreur dans Filsgood Bot : {e}")
+        raise
 
     finally:
         if driver:
@@ -123,8 +128,60 @@ def run_bot():
             driver.quit()
             logging.info("Driver fermé.")
 
-# Lancement
+# --- Gestion des horaires et exécutions ---
+
+def random_time_execution():
+    logging.info("Vérification de l'heure et du weekend avant exécution...")
+
+    while True:
+        today = datetime.datetime.now(tz=PARIS_TZ)
+        weekday = today.weekday()
+
+        if weekday >= 5:  # Samedi ou dimanche
+            days_until_monday = (7 - weekday)
+            next_monday = today + datetime.timedelta(days=days_until_monday)
+            next_monday = next_monday.replace(hour=9, minute=0, second=0, microsecond=0)
+            wait_time = (next_monday - today).total_seconds()
+            logging.info(f"Weekend détecté. Attente jusqu'à lundi 9h Paris... (dans {wait_time:.0f} secondes)")
+            time.sleep(wait_time)
+            continue
+
+        # Jours de semaine : tirage de 4 minutes aléatoires dans l'heure 9h-10h
+        random_minutes = sorted(random.sample(range(60), 4))
+        now = datetime.datetime.now(tz=PARIS_TZ)
+        execution_times = [now.replace(hour=9, minute=m, second=0, microsecond=0) for m in random_minutes]
+        execution_times = [t if t > now else t + datetime.timedelta(days=1) for t in execution_times]
+
+        readable_times = [t.strftime("%H:%M") for t in execution_times]
+        logging.info(f"Horaires choisis pour aujourd'hui (heure Paris) : {', '.join(readable_times)}")
+
+        for i, exec_time in enumerate(execution_times, 1):
+            now = datetime.datetime.now(tz=PARIS_TZ)
+            wait_time = (exec_time - now).total_seconds()
+
+            if wait_time > 0:
+                logging.info(f"Attente de {wait_time:.0f} secondes avant exécution à {exec_time.strftime('%H:%M')} Paris...")
+                time.sleep(wait_time)
+
+            logging.info(f"--- Lancement du bot à {datetime.datetime.now(tz=PARIS_TZ).strftime('%H:%M:%S')} Paris (exécution {i}/4) ---")
+            try:
+                run_bot()
+            except Exception as e:
+                logging.error(f"Erreur lors de l'exécution du bot : {e}")
+                send_telegram_alert(f"❌ Filsgood Bot : erreur à l'exécution {i} - {e}")
+
+            time.sleep(60)  # Pause après exécution
+
+        send_telegram_alert("✅ Filsgood Bot : les 4 exécutions journalières sont terminées avec succès.")
+
+        # Attente jusqu'au lendemain 9h00
+        next_day = datetime.datetime.now(tz=PARIS_TZ) + datetime.timedelta(days=1)
+        next_start = next_day.replace(hour=9, minute=0, second=0, microsecond=0)
+        wait_time = (next_start - datetime.datetime.now(tz=PARIS_TZ)).total_seconds()
+        logging.info(f"Journée terminée. Attente jusqu'à demain 9h Paris... (dans {wait_time:.0f} secondes)")
+        time.sleep(wait_time)
+
 if __name__ == "__main__":
-    logging.info("🚀 Démarrage du Filsgood Bot.")
-    send_telegram_alert("🚀 Filsgood Bot a démarré.")  # Test notification démarrage
-    run_bot()
+    logging.info("🚀 Démarrage du Filsgood Bot avec exécutions planifiées.")
+    send_telegram_alert("🚀 Filsgood Bot a démarré.")
+    random_time_execution()
