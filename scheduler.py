@@ -12,8 +12,9 @@ import telegram
 print(">>> Démarrage du bot <<<")  # Trace de démarrage
 
 # Configuration Telegram
-TELEGRAM_TOKEN = "TON_BOT_TOKEN"
-TELEGRAM_CHAT_ID = "TON_CHAT_ID"
+# Récupération des variables d'environnement
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
 # Configuration logging
 log_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
