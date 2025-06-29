@@ -20,7 +20,8 @@ services:
       - selenium
     environment:
       - SELENIUM_HOST=filsgood_bot-selenium
-      # ajoute ici tes variables d'environnement si besoin
+      - TELEGRAM_BOT_TOKEN
+      - TELEGRAM_CHAT_ID
     volumes:
       - /AppData/filsgood_bot:/app
     command: >
