@@ -1,7 +1,6 @@
 import time
 import logging
 import random
-import os
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
 from selenium import webdriver
@@ -10,9 +9,11 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import telegram
 
-# Récupération des variables d'environnement
-TELEGRAM_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+print(">>> Démarrage du bot <<<")  # Trace de démarrage
+
+# Configuration Telegram
+TELEGRAM_TOKEN = "TON_BOT_TOKEN"
+TELEGRAM_CHAT_ID = "TON_CHAT_ID"
 
 # Configuration logging
 log_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
@@ -22,12 +23,6 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 logger.addHandler(log_handler)
 
-# Vérification des variables Telegram
-if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID:
-    logging.error("❌ Variables d'environnement TELEGRAM_BOT_TOKEN ou TELEGRAM_CHAT_ID manquantes.")
-    raise EnvironmentError("Variables d'environnement Telegram manquantes.")
-
-# Envoie une notification Telegram
 def send_telegram_alert(message):
     try:
         bot = telegram.Bot(token=TELEGRAM_TOKEN)
@@ -36,11 +31,9 @@ def send_telegram_alert(message):
     except Exception as e:
         logging.error(f"Erreur d'envoi Telegram : {e}")
 
-# Attente explicite d’un élément
 def wait_for_element(driver, by, value, timeout=10):
     return WebDriverWait(driver, timeout).until(EC.presence_of_element_located((by, value)))
 
-# Fonction de clic générique sur un bouton (avec le texte affiché)
 def click_next(driver, button_text):
     try:
         button = wait_for_element(driver, By.XPATH, f"//button[contains(text(), '{button_text}')]")
@@ -52,17 +45,17 @@ def click_next(driver, button_text):
         send_telegram_alert(f"❌ Erreur lors du clic sur '{button_text}' : {e}")
         raise
 
-# Fonction principale
 def run_bot():
+    print(">>> Entrée dans run_bot <<<")  # Trace run_bot
     send_telegram_alert("🚀 Lancement du bot en cours...")
 
     options = webdriver.ChromeOptions()
-    options.add_argument("--headless")  # à retirer si tu veux voir le navigateur
+    options.add_argument("--headless")
     driver = None
 
     try:
         driver = webdriver.Remote(
-            command_executor="http://localhost:4444/wd/hub",
+            command_executor="http://filsgood_bot-selenium:4444/wd/hub",  # <-- Correction ici
             options=options
         )
 
@@ -72,7 +65,6 @@ def run_bot():
         click_next(driver, "8h-16h")
         click_next(driver, "En bonne forme")
 
-        # Clic spécifique sur le bouton "Envoyer le formulaire"
         try:
             submit_button = wait_for_element(
                 driver, By.XPATH, "//input[@type='submit' and @value='Envoyer le formulaire']"
@@ -95,8 +87,8 @@ def run_bot():
             driver.quit()
             logging.info("Driver fermé.")
 
-# Pour exécuter immédiatement sans scheduler
 if __name__ == "__main__":
+    print(">>> Entrée dans main <<<")  # Trace main
     try:
         run_bot()
     except Exception as e:
