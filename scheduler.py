@@ -131,6 +131,15 @@ def random_time_execution(run_bot_func):
     success_count = 0
     error_count = 0
 
+    # Exécution immédiate au lancement
+    logging.info("Exécution immédiate du bot au démarrage.")
+    try:
+        run_bot_func()
+        success_count += 1
+    except Exception as e:
+        error_count += 1
+        logging.error(f"Run_bot a échoué lors de l'exécution immédiate: {e}")
+
     while True:
         now = datetime.datetime.now(tz=PARIS_TZ)
         weekday = now.weekday()
@@ -141,7 +150,7 @@ def random_time_execution(run_bot_func):
             next_monday = next_monday.replace(hour=9, minute=0, second=0, microsecond=0)
             wait_sec = (next_monday - now).total_seconds()
             logging.info(f"Weekend détecté. Mise en pause jusqu'à lundi 9h ({wait_sec:.0f}s)...")
-            send_telegram_alert(f"🛑 Weekend détecté. Filsgood Bot en pause jusqu'à lundi 9h.")
+            # Suppression notification Telegram pendant weekend
             time.sleep(wait_sec)
             continue
 
