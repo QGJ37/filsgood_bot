@@ -1,7 +1,7 @@
 import time
 import logging
 import random
-from datetime import datetime
+from datetime import datetime, timedelta
 from logging.handlers import RotatingFileHandler
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -9,13 +9,16 @@ from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
 import telegram
 import os
+from zoneinfo import ZoneInfo
 
 print(">>> Démarrage du bot <<<")  # Trace de démarrage
 
 # Configuration Telegram
-# Récupération des variables d'environnement
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+
+# Fuseau horaire Paris
+PARIS_TZ = ZoneInfo("Europe/Paris")
 
 # Configuration logging
 log_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
@@ -64,7 +67,6 @@ def run_bot():
         driver.get("http://www.filgoods.iftl-ev.fr/")
         time.sleep(3)
 
-        # Cibler le select par ID, plus fiable que par tag_name
         select_element = wait_for_element(driver, By.ID, "ville")
         select = Select(select_element)
         select.select_by_visible_text("Brest")
@@ -103,9 +105,60 @@ def run_bot():
             driver.quit()
             logging.info("Driver fermé.")
 
+def scheduler_loop():
+    logging.info("Démarrage du scheduler avec exécution immédiate et planifications.")
+
+    # Exécution immédiate au lancement du script
+    logging.info("--- Exécution immédiate du bot au lancement du script ---")
+    run_bot()
+
+    while True:
+        now = datetime.now(tz=PARIS_TZ)
+        weekday = now.weekday()
+
+        # Gestion weekend : on attend jusqu'à lundi 9h
+        if weekday >= 5:  # samedi=5, dimanche=6
+            days_until_monday = (7 - weekday)
+            next_monday = now + timedelta(days=days_until_monday)
+            next_monday = next_monday.replace(hour=9, minute=0, second=0, microsecond=0)
+            wait_seconds = (next_monday - now).total_seconds()
+            logging.info(f"Weekend détecté, attente jusqu'à lundi 9h Paris ({wait_seconds:.0f}s)...")
+            time.sleep(wait_seconds)
+            continue
+
+        # En semaine : planification 4 fois entre 9h00-9h59 (minutes aléatoires)
+        random_minutes = sorted(random.sample(range(60), 4))
+        exec_times = [now.replace(hour=9, minute=m, second=0, microsecond=0) for m in random_minutes]
+        exec_times = [t if t > now else t + timedelta(days=1) for t in exec_times]
+
+        readable_times = ", ".join(t.strftime("%H:%M") for t in exec_times)
+        logging.info(f"Horaires d'exécution planifiés aujourd'hui (heure Paris) : {readable_times}")
+
+        for i, exec_time in enumerate(exec_times, start=1):
+            now = datetime.now(tz=PARIS_TZ)
+            wait_seconds = (exec_time - now).total_seconds()
+
+            if wait_seconds > 0:
+                logging.info(f"Attente {wait_seconds:.0f}s avant exécution à {exec_time.strftime('%H:%M')} Paris...")
+                time.sleep(wait_seconds)
+
+            logging.info(f"--- Exécution {i} du bot à {datetime.now(tz=PARIS_TZ).strftime('%H:%M:%S')} Paris ---")
+            run_bot()
+            time.sleep(60)  # Pause post-exécution
+
+        # Après les 4 exécutions, envoi d’un message Telegram de récapitulatif
+        send_telegram_alert("✅ Toutes les exécutions du jour ont été réalisées avec succès !")
+
+        # Fin de journée : attendre jusqu'au lendemain 9h
+        next_day = datetime.now(tz=PARIS_TZ) + timedelta(days=1)
+        next_start = next_day.replace(hour=9, minute=0, second=0, microsecond=0)
+        wait_seconds = (next_start - datetime.now(tz=PARIS_TZ)).total_seconds()
+        logging.info(f"Journée terminée. Attente jusqu'à demain 9h Paris ({wait_seconds:.0f}s)...")
+        time.sleep(wait_seconds)
+
 if __name__ == "__main__":
     print(">>> Entrée dans main <<<")  # Trace main
     try:
-        run_bot()
+        scheduler_loop()
     except Exception as e:
-        logging.error(f"Run_bot a échoué lors de l'exécution immédiate: {e}")
+        logging.error(f"Erreur fatale dans scheduler_loop : {e}")
