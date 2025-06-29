@@ -1,7 +1,21 @@
+version: "3.8"
+
+services:
+  selenium:
+    container_name: filsgood_bot-selenium
+    image: selenium/standalone-chrome:latest
+    ports:
+      - "4444:4444"   # Port Selenium exposé
+    volumes:
+      - /dev/shm:/dev/shm
+    restart: unless-stopped
+    networks:
+      - filsgood_bot_network
+
   bot:
     container_name: filsgood_bot
     image: python:3.9-slim
-    user: root
+    user: root  # Pour avoir les droits root
     depends_on:
       - selenium
     environment:
@@ -28,9 +42,15 @@
         mv /app/bot_code/* /app/ &&
         rm -rf /app/bot_code &&
         until curl -s http://filsgood_bot-selenium:4444/wd/hub/status | grep -q '\"ready\": true'; do
+          echo 'En attente de Selenium...';
           sleep 5;
         done &&
-        python3 /app/scheduler.py"
+        python3 /app/scheduler.py
+      "
     restart: unless-stopped
     networks:
       - filsgood_bot_network
+
+networks:
+  filsgood_bot_network:
+    driver: bridge
