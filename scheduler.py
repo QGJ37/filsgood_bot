@@ -62,7 +62,14 @@ def run_bot():
         )
 
         driver.get("http://www.filgoods.iftl-ev.fr/")
+        time.sleep(3)
+
+        select_element = wait_for_element(driver, By.TAG_NAME, "select")
+        select = Select(select_element)
+        select.select_by_visible_text("Brest")
+        logging.info("Option 'Brest' sélectionnée.")
         time.sleep(1)
+
         click_next(driver, "Confirm")
         click_next(driver, "Bien dormi(>8h)")
         click_next(driver, "Aucune")
