@@ -1,6 +1,7 @@
 import time
 import logging
 import random
+import os
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
 from selenium import webdriver
@@ -9,9 +10,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import telegram
 
-# Configuration Telegram
-TELEGRAM_TOKEN = "TON_BOT_TOKEN"
-TELEGRAM_CHAT_ID = "TON_CHAT_ID"
+# Récupération des variables d'environnement
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
 # Configuration logging
 log_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
@@ -20,6 +21,11 @@ log_handler.setFormatter(log_formatter)
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 logger.addHandler(log_handler)
+
+# Vérification des variables Telegram
+if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID:
+    logging.error("❌ Variables d'environnement TELEGRAM_BOT_TOKEN ou TELEGRAM_CHAT_ID manquantes.")
+    raise EnvironmentError("Variables d'environnement Telegram manquantes.")
 
 # Envoie une notification Telegram
 def send_telegram_alert(message):
