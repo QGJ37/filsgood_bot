@@ -61,9 +61,15 @@ def run_bot():
             options=options
         )
 
-        driver.get("http://ton_site/formulaire")
+        driver.get("http://www.filgoods.iftl-ev.fr/")
         time.sleep(1)
-
+        click_next(driver, "Confirm")
+        click_next(driver, "Bien dormi(>8h)")
+        click_next(driver, "Aucune")
+        click_next(driver, "Aucun")
+        click_next(driver, "Aucune")
+        click_next(driver, "Aucune")
+        click_next(driver, "Aucun")
         click_next(driver, "8h-16h")
         click_next(driver, "En bonne forme")
 
