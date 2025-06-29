@@ -188,4 +188,12 @@ def random_time_execution():
 if __name__ == "__main__":
     logging.info("🚀 Démarrage du Filsgood Bot avec exécutions planifiées.")
     send_telegram_alert("🚀 Filsgood Bot a démarré.")
+    
+    try:
+        logging.info("Exécution immédiate du bot au démarrage...")
+        run_bot()
+    except Exception as e:
+        logging.error(f"Erreur lors de l'exécution immédiate : {e}")
+    
     random_time_execution()
+
