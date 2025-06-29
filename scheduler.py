@@ -1,77 +1,95 @@
+import time
 import logging
+import random
+from datetime import datetime
+from logging.handlers import RotatingFileHandler
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import time
 import telegram
 
-# --- CONFIG ---
+# Configuration Telegram
 TELEGRAM_TOKEN = "TON_BOT_TOKEN"
 TELEGRAM_CHAT_ID = "TON_CHAT_ID"
-REMOTE_URL = "http://localhost:4444/wd/hub"
-URL_FORMULAIRE = "http://ton_site/formulaire"
 
-# --- LOGGER ---
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# Configuration logging
+log_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+log_handler = RotatingFileHandler("bot.log", maxBytes=2000000, backupCount=3)
+log_handler.setFormatter(log_formatter)
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+logger.addHandler(log_handler)
 
-# --- FONCTIONS UTILES ---
-def send_telegram(message):
+# Envoie une notification Telegram
+def send_telegram_alert(message):
     try:
         bot = telegram.Bot(token=TELEGRAM_TOKEN)
         bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
         logging.info("📲 Notification Telegram envoyée.")
     except Exception as e:
-        logging.error(f"Erreur lors de l'envoi Telegram : {e}")
+        logging.error(f"Erreur d'envoi Telegram : {e}")
 
-def find_element_safe(driver, by, value, timeout=10):
+# Attente explicite d’un élément
+def wait_for_element(driver, by, value, timeout=10):
+    return WebDriverWait(driver, timeout).until(EC.presence_of_element_located((by, value)))
+
+# Fonction de clic générique sur un bouton (avec le texte affiché)
+def click_next(driver, button_text):
     try:
-        elem = WebDriverWait(driver, timeout).until(EC.presence_of_element_located((by, value)))
-        logging.info(f"Élément trouvé : {value}")
-        return elem
+        button = wait_for_element(driver, By.XPATH, f"//button[contains(text(), '{button_text}')]")
+        button.click()
+        logging.info(f"Clic sur le bouton '{button_text}' effectué.")
+        time.sleep(1)
     except Exception as e:
-        logging.error(f"Erreur lors de la recherche de l'élément {value} : {e}")
-        return None
+        logging.error(f"Erreur lors du clic sur '{button_text}' : {e}")
+        send_telegram_alert(f"❌ Erreur lors du clic sur '{button_text}' : {e}")
+        raise
 
-def clic_element(driver, by, value, label):
-    elem = find_element_safe(driver, by, value)
-    if elem:
-        try:
-            elem.click()
-            logging.info(f"Clic sur le bouton '{label}' effectué.")
-        except Exception as e:
-            logging.error(f"Erreur lors du clic sur '{label}' : {e}")
-    else:
-        logging.error(f"Bouton '{label}' non trouvé.")
-
-# --- SCRIPT PRINCIPAL ---
+# Fonction principale
 def run_bot():
-    send_telegram("🚀 Lancement du bot en cours...")
+    send_telegram_alert("🚀 Lancement du bot en cours...")
 
     options = webdriver.ChromeOptions()
-    options.add_argument("--headless")  # optionnel : pour ne pas afficher le navigateur
+    options.add_argument("--headless")  # à retirer si tu veux voir le navigateur
+    driver = None
+
     try:
-        driver = webdriver.Remote(command_executor=REMOTE_URL, options=options)
-        driver.get(URL_FORMULAIRE)
-        time.sleep(2)  # ajuster si besoin
+        driver = webdriver.Remote(
+            command_executor="http://localhost:4444/wd/hub",
+            options=options
+        )
 
-        # Étapes du formulaire
-        clic_element(driver, By.XPATH, "//button[contains(text(), '8h-16h')]", "8h-16h")
-        clic_element(driver, By.XPATH, "//button[contains(text(), 'En bonne forme')]", "En bonne forme")
+        driver.get("http://ton_site/formulaire")
+        time.sleep(1)
 
-        # ✅ Nouvelle cible pour le bouton "Envoyer le formulaire"
-        clic_element(driver, By.XPATH, "//input[@type='submit' and @value='Envoyer le formulaire']", "Envoyer le formulaire")
+        click_next(driver, "8h-16h")
+        click_next(driver, "En bonne forme")
 
-        send_telegram("✅ Formulaire soumis avec succès !")
+        # Clic spécifique sur le bouton "Envoyer le formulaire"
+        try:
+            submit_button = wait_for_element(
+                driver, By.XPATH, "//input[@type='submit' and @value='Envoyer le formulaire']"
+            )
+            submit_button.click()
+            logging.info("Clic sur le bouton 'Envoyer le formulaire' effectué.")
+            time.sleep(1)
+        except Exception as e:
+            logging.error(f"Erreur lors du clic sur 'Envoyer le formulaire' : {e}")
+            send_telegram_alert(f"❌ Erreur lors du clic final : {e}")
+            raise
+
+        send_telegram_alert("✅ Formulaire soumis avec succès !")
 
     except Exception as e:
         logging.error(f"❌ Erreur lors de la connexion ou de l'exécution du bot : {e}")
-        send_telegram(f"❌ Erreur pendant l'exécution du bot : {e}")
+        send_telegram_alert(f"❌ Erreur générale du bot : {e}")
     finally:
-        driver.quit()
-        logging.info("Driver fermé.")
+        if driver:
+            driver.quit()
+            logging.info("Driver fermé.")
 
-# --- LANCEMENT ---
+# Pour exécuter immédiatement sans scheduler
 if __name__ == "__main__":
     try:
         run_bot()
