@@ -26,26 +26,42 @@ services:
       - /AppData/filsgood_bot:/app
     command: >
       sh -c "
+        set -e  # Quitte au moindre erreur
+        echo 'Mise à jour des paquets...' &&
         apt-get update &&
         apt-get install -y curl git python3-venv python3-pip &&
+    
         if [ ! -d /app/venv ]; then
+          echo 'Création de l\'environnement virtuel et installation des dépendances...' &&
           python3 -m venv /app/venv &&
           . /app/venv/bin/activate &&
+          pip install --upgrade pip &&
           pip install selenium requests;
         else
+          echo 'Activation de l\'environnement virtuel...' &&
           . /app/venv/bin/activate;
         fi &&
+    
         git config --global core.fileMode false &&
         chmod -R 777 /app &&
+    
+        echo 'Nettoyage du dossier /app sauf /app/venv...' &&
         find /app -mindepth 1 ! -path '/app/venv*' -delete &&
+    
+        echo 'Clonage du dépôt Git...' &&
         git clone https://github.com/QGJ37/filsgood_bot.git /app/bot_code &&
         mv /app/bot_code/* /app/ &&
         rm -rf /app/bot_code &&
+    
+        echo 'Attente que Selenium soit prêt...' &&
         until curl -s http://filsgood_bot-selenium:4444/wd/hub/status | grep -q '\"ready\": true'; do
           echo 'En attente de Selenium...';
           sleep 5;
         done &&
-        . /app/venv/bin/activate && python3 /app/scheduler.py
+    
+        echo 'Lancement du script scheduler.py...' &&
+        . /app/venv/bin/activate &&
+        python3 /app/scheduler.py
       "
 
     restart: unless-stopped
