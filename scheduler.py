@@ -119,7 +119,7 @@ def run_bot():
         logging.info("Clic sur le bouton 'Envoyer le formulaire' effectué.")
         time.sleep(1)
 
-        send_telegram_alert("✅ Formulaire soumis avec succès !")
+        #send_telegram_alert("✅ Formulaire soumis avec succès !")
 
     except Exception as e:
         logging.error(f"❌ Erreur lors de l'exécution du bot : {e}")
