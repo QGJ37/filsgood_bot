@@ -237,7 +237,7 @@ def random_time_execution():
 
         # Attendre jusqu'au prochain jour ouvré 9h
         now = now_paris()
-        start_next = next_weekday_9(now + datetime.timedelta(days=1))
+        start_next = next_weekday_9(now)
         wait_time = (start_next - now).total_seconds()
         logging.info(f"Journée terminée. Attente jusqu'au prochain jour ouvré 9h Paris... (dans {wait_time:.0f} secondes)")
         time.sleep(max(wait_time, 0))
@@ -256,3 +256,4 @@ if __name__ == "__main__":
         logging.error(f"Erreur lors de l'exécution immédiate : {e}")
 
     random_time_execution()
+
