@@ -200,10 +200,8 @@ def run_bot():
 # --- Gestion des horaires et exécutions ---
 def random_time_execution():
     logging.info("Vérification de l'heure et du weekend avant exécution...")
-
     while True:
         now = now_paris()
-
         if not is_weekday_paris(now):
             next_start = next_monday_9(now)
             wait_time = (next_start - now).total_seconds()
@@ -214,7 +212,10 @@ def random_time_execution():
         execution_times = schedule_four_times_for_next_business_day(now)
         readable_times = [t.strftime("%H:%M") for t in execution_times]
         logging.info(f"Horaires choisis (heure Paris) : {', '.join(readable_times)}")
-
+        
+        # Compteur des exécutions réussies
+        successful_executions = 0
+        
         for i, exec_time in enumerate(execution_times, 1):
             now = now_paris()
             wait_time = (exec_time - now).total_seconds()
@@ -229,18 +230,36 @@ def random_time_execution():
             logging.info(f"--- Lancement du bot à {now_paris().strftime('%H:%M:%S')} Paris (exécution {i}/4) ---")
             try:
                 run_bot()
+                successful_executions += 1
+                logging.info(f"✅ Exécution {i}/4 réussie ({successful_executions} succès au total)")
             except Exception as e:
                 logging.error(f"Erreur lors de l'exécution du bot : {e}")
-                send_telegram_alert(f"❌ Filsgood Bot : erreur à l'exécution {i} - {e}")
+                send_telegram_alert(f"❌ Filsgood Bot : erreur à l'exécution {i}/4 - {e}")
 
             time.sleep(60)  # Pause après exécution
 
+        # Notification de succès de la journée
+        current_date = now_paris().strftime("%d/%m/%Y")
+        if successful_executions == 4:
+            success_message = f"✅ Journée du {current_date} terminée avec succès !\n🎯 4/4 exécutions réussies aux horaires : {', '.join(readable_times)}"
+            send_telegram_alert(success_message)
+            logging.info("🎉 Journée complète avec 4 exécutions réussies - notification envoyée")
+        elif successful_executions > 0:
+            partial_message = f"⚠️ Journée du {current_date} terminée partiellement\n✅ {successful_executions}/4 exécutions réussies"
+            send_telegram_alert(partial_message)
+            logging.info(f"📊 Journée complète avec {successful_executions}/4 exécutions - notification envoyée")
+        else:
+            failure_message = f"❌ Journée du {current_date} échouée\n💥 0/4 exécutions réussies"
+            send_telegram_alert(failure_message)
+            logging.error("💥 Aucune exécution réussie dans la journée - notification envoyée")
+
         # Attendre jusqu'au prochain jour ouvré 9h
         now = now_paris()
-        start_next = next_weekday_9(now)
+        start_next = next_weekday_9(now)  # ← Correction du bug précédent aussi !
         wait_time = (start_next - now).total_seconds()
         logging.info(f"Journée terminée. Attente jusqu'au prochain jour ouvré 9h Paris... (dans {wait_time:.0f} secondes)")
         time.sleep(max(wait_time, 0))
+
 
 if __name__ == "__main__":
     logging.info("🚀 Démarrage du Filsgood Bot avec exécutions planifiées.")
@@ -256,4 +275,5 @@ if __name__ == "__main__":
         logging.error(f"Erreur lors de l'exécution immédiate : {e}")
 
     random_time_execution()
+
 
