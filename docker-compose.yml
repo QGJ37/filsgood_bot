@@ -23,7 +23,7 @@ services:
       - TELEGRAM_BOT_TOKEN
       - TELEGRAM_CHAT_ID
     volumes:
-      - /AppData/filsgood_bot:/app
+      - /mnt/appdata/filsgood_bot:/app
     command: >
       sh -c "
         echo 'Mise à jour des paquets...' &&
@@ -61,3 +61,4 @@ services:
 networks:
   filsgood_bot_network:
     driver: bridge
+
