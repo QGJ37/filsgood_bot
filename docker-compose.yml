@@ -7,7 +7,7 @@ services:
     command:
       - "sh"
       - "-c"
-      - "\n  echo 'Mise à jour des paquets...' &&\n  apt-get update &&\n  apt-get install -y curl git python3-venv python3-pip &&\n  if [ ! -f /app/venv/bin/activate ]; then\n    echo 'Création de l''environnement virtuel...' &&\n    rm -rf /app/venv &&\n    python3 -m venv /app/venv;\n  else\n    echo 'Environnement virtuel déjà existant...';\n  fi &&\n  echo 'Activation de l''environnement virtuel...' &&\n  . /app/venv/bin/activate &&\n  pip install --upgrade pip &&\n  pip install --no-cache-dir selenium==4.36.0 requests python-telegram-bot==13.15 &&\n  git config --global core.fileMode false &&\n  chmod -R 777 /app &&\n  echo 'Suppression du contenu du dossier /app sauf /app/venv...' &&\n  find /app -mindepth 1 ! -path '/app/venv*' -delete &&\n  echo 'Clonage du dépôt Git...' &&\n  git clone https://github.com/QGJ37/filsgood_bot.git /app/bot_code &&\n  mv /app/bot_code/* /app/ &&\n  rm -rf /app/bot_code &&\n  echo 'Vérification de la disponibilité de Selenium...' &&\n  until curl -s http://filsgood_bot-selenium:4444/wd/hub/status | grep -qE '\"ready\"[[:space:]]*:[[:space:]]*true'; do\n    echo 'En attente de Selenium...';\n    sleep 5;\n  done &&\n  echo 'Selenium prêt. Lancement du planificateur...' &&\n  python3 /app/scheduler.py"
+      - "\n  echo 'Mise à jour des paquets...' &&\n  apt-get update &&\n  apt-get install -y curl git &&\n  if [ ! -f /app/venv/bin/activate ]; then\n    echo 'Création de l''environnement virtuel...' &&\n    rm -rf /app/venv &&\n    python3 -m venv /app/venv;\n  else\n    echo 'Environnement virtuel déjà existant...';\n  fi &&\n  echo 'Activation de l''environnement virtuel...' &&\n  . /app/venv/bin/activate &&\n  pip install --upgrade pip &&\n  pip install --no-cache-dir selenium==4.36.0 requests python-telegram-bot==13.15 &&\n  git config --global core.fileMode false &&\n  chmod -R 777 /app &&\n  echo 'Suppression du contenu du dossier /app sauf /app/venv...' &&\n  find /app -mindepth 1 ! -path '/app/venv*' -delete &&\n  echo 'Clonage du dépôt Git...' &&\n  git clone https://github.com/QGJ37/filsgood_bot.git /app/bot_code &&\n  mv /app/bot_code/* /app/ &&\n  rm -rf /app/bot_code &&\n  echo 'Vérification de la disponibilité de Selenium...' &&\n  until curl -s http://filsgood_bot-selenium:4444/wd/hub/status | grep -qE '\"ready\"[[:space:]]*:[[:space:]]*true'; do\n    echo 'En attente de Selenium...';\n    sleep 5;\n  done &&\n  echo 'Selenium prêt. Lancement du planificateur...' &&\n  python3 /app/scheduler.py"
     environment:
       - SELENIUM_HOST=filsgood_bot-selenium
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
@@ -21,7 +21,7 @@ services:
       - filsgood_bot_network
 
   filsgood_bot-selenium:
-    image: selenium/standalone-chrome:stable-filsgood
+    image: selenium/standalone-chrome@sha256:d6843a37cd2852fac7f33099709a203769f864dcf260e740a34e9605055c1dd5
     container_name: filsgood_bot-selenium
     hostname: filsgood_bot-selenium
     shm_size: 2gb
